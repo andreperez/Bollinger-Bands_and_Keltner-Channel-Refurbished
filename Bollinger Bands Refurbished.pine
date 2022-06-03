@@ -1,0 +1,280 @@
+//@version=5
+// @author=andre_007
+
+indicator("Bollinger Bands Refurbished", shorttitle='BB Refurbished', format=format.price, precision=2, overlay=true)
+
+// ------------------------- Constants {
+var string SMA          = 'Simple Moving Average'
+var string EMA          = 'Exponential Moving Average'
+var string HMA          = 'Hull Moving Average'
+var string ALMA         = 'Arnaud Legoux Moving Average'
+var string MEDIAN       = 'Median'
+var string VWAP         = 'VWAP'
+var string REMA         = 'Regularized Exponential Moving Average'
+var color color1        = color.blue
+var color color2        = color.yellow
+var color color3        = color.red
+// ------------------------- }
+
+// ------------------------- Inputs {
+src = input.source(defval=close, title='Source', inline='1')
+length = input.int(200, minval=1, inline='1')
+
+var string typeMa = input.string(defval=REMA, title='Type MA',
+  options=[SMA, EMA, HMA, ALMA, MEDIAN, VWAP, REMA],
+  inline='2')
+  
+multiplier = input.float(1, minval=0.001, maxval=10, title='Multiplier', inline='2')
+
+band1  = input.float(0.236, minval=0.001, maxval=10, step=0.2, title='Band 1', inline='3')
+band2  = input.float(0.382, minval=0.001, maxval=10, step=0.2, title='Band 2', inline='3')
+band3  = input.float(0.5, minval=0.001, maxval=10, step=0.2, title='Band 3', inline='4')
+band4  = input.float(0.618, minval=0.001, maxval=10, step=0.2, title='Band 4', inline='4')
+band5  = input.float(0.786, minval=0.001, maxval=10, step=0.2, title='Band 5', inline='5')
+
+band6  = input.float(1, minval=0.001, maxval=10, step=0.2, title='Band 6', inline='5')
+band7  = input.float(1.236, minval=0.001, maxval=10, step=0.2, title='Band 7', inline='6')
+band8  = input.float(1.382, minval=0.001, maxval=10, step=0.2, title='Band 8', inline='6')
+band9  = input.float(1.5, minval=0.001, maxval=10, step=0.2, title='Band 9', inline='7')
+band10 = input.float(1.618, minval=0.001, maxval=10, step=0.2, title='Band 10', inline='7')
+band11 = input.float(1.786, minval=0.001, maxval=10, step=0.2, title='Band 11', inline='8')
+
+band12 = input.float(2, minval=0.001, maxval=10, step=0.2, title='Band 12', inline='8')
+band13 = input.float(2.236, minval=0.001, maxval=10, step=0.2, title='Band 13', inline='9')
+band14 = input.float(2.382, minval=0.001, maxval=10, step=0.2, title='Band 14', inline='9')
+band15 = input.float(2.5, minval=0.001, maxval=10, step=0.2, title='Band 15', inline='10')
+band16 = input.float(2.618, minval=0.001, maxval=10, step=0.2, title='Band 16', inline='10')
+band17 = input.float(2.786, minval=0.001, maxval=10, step=0.2, title='Band 17', inline='11')
+band18 = input.float(3, minval=0.001, maxval=10, step=0.2, title='Band 18', inline='11')
+// ------------------------- }
+
+
+// ------------------------- Moving Average {
+// The Regularized Exponential Moving Average or Regularized EMA is a trading indicator introduced by Chris Satchwell in July 2003 version of Stock & Commodities magazine.
+// This technical analysis indicator was designed to be smoother and with less lag that the traditional exponential moving average. 
+// The indicator gets the EMA period and the Lambda value (A factor that controls the "regularization" amount). 
+// When the Lambda value is set to zero, the Regularized Exponential Moving Average becomes the standard EMA.
+// The first argument of the Regularized EMA function gets the price series that will be smoothed. 
+// Usually, the close price is used but you can also use and calculate the Regularized EMA of any other price series or technical indicators.
+// lambda = input(title="Regularization Constant", type=float, minval=0, defval=0.5)
+rema(float src, simple int len, simple float lambda=0.5) =>
+    alpha = 2 / (len + 1)
+    ma = 0.0
+    ma := (nz(ma[1]) + alpha * (src - nz(ma[1])) + lambda * (2 * nz(ma[1]) - nz(ma[2]))) / (lambda + 1)
+
+fCalcMa(series float src, simple string type, simple int len) =>
+    maRet = switch type
+        SMA => ta.sma(src, len)
+        EMA => ta.ema(src, len)
+        HMA => ta.hma(src, len)
+        ALMA => ta.alma(src, len, 0.85, 6, false)
+        MEDIAN => ta.median(src, len)
+        VWAP => ta.vwap(src)
+        REMA => rema(src, len)
+// ------------------------- }
+
+// ------------------------- Calcs {
+basis = fCalcMa(src, typeMa, length)
+deviation = multiplier * ta.stdev(src, length)
+
+upper_1  = basis + (band1*deviation)
+upper_2  = basis + (band2*deviation)
+upper_3  = basis + (band3*deviation)
+upper_4  = basis + (band4*deviation)
+upper_5  = basis + (band5*deviation)
+upper_6  = basis + (band6*deviation)
+upper_7  = basis + (band7*deviation)
+upper_8  = basis + (band8*deviation)
+upper_9  = basis + (band9*deviation)
+upper_10 = basis + (band10*deviation)
+upper_11 = basis + (band11*deviation)
+upper_12 = basis + (band12*deviation)
+upper_13 = basis + (band13*deviation)
+upper_14 = basis + (band14*deviation)
+upper_15 = basis + (band15*deviation)
+upper_16 = basis + (band16*deviation)
+upper_17 = basis + (band17*deviation)
+upper_18 = basis + (band18*deviation)
+
+lower_1  = basis - (band1*deviation)
+lower_2  = basis - (band2*deviation)
+lower_3  = basis - (band3*deviation)
+lower_4  = basis - (band4*deviation)
+lower_5  = basis - (band5*deviation)
+lower_6  = basis - (band6*deviation)
+lower_7  = basis - (band7*deviation)
+lower_8  = basis - (band8*deviation)
+lower_9  = basis - (band9*deviation)
+lower_10 = basis - (band10*deviation)
+lower_11 = basis - (band11*deviation)
+lower_12 = basis - (band12*deviation)
+lower_13 = basis - (band13*deviation)
+lower_14 = basis - (band14*deviation)
+lower_15 = basis - (band15*deviation)
+lower_16 = basis - (band16*deviation)
+lower_17 = basis - (band17*deviation)
+lower_18 = basis - (band18*deviation)
+
+// ------------------------- }
+
+// ------------------------- Plots {
+pBasis = plot(basis, color=color.white, linewidth=3)
+
+pUpper1  = plot(upper_1 , color=color.new(color1, 50), linewidth=1, title="Band Upper 1", display=display.all)
+pUpper2  = plot(upper_2 , color=color.new(color1, 45), linewidth=1, title="Band Upper 2", display=display.all)
+pUpper3  = plot(upper_3 , color=color.new(color1, 40), linewidth=1, title="Band Upper 3", display=display.all)
+pUpper4  = plot(upper_4 , color=color.new(color1, 35), linewidth=1, title="Band Upper 4", display=display.all)
+pUpper5  = plot(upper_5 , color=color.new(color1, 30), linewidth=1, title="Band Upper 5", display=display.all)
+pUpper6  = plot(upper_6 , color=color.new(color1, 0) , linewidth=2, title="Band Upper 6", display=display.all)
+pUpper7  = plot(upper_7 , color=color.new(color2, 50), linewidth=1, title="Band Upper 7", display=display.all)
+pUpper8  = plot(upper_8 , color=color.new(color2, 45), linewidth=1, title="Band Upper 8", display=display.all)
+pUpper9  = plot(upper_9 , color=color.new(color2, 40), linewidth=1, title="Band Upper 9", display=display.all)
+pUpper10 = plot(upper_10, color=color.new(color2, 35), linewidth=1, title="Band Upper 10", display=display.all)
+pUpper11 = plot(upper_11, color=color.new(color2, 30), linewidth=1, title="Band Upper 11", display=display.all)
+pUpper12 = plot(upper_12, color=color.new(color2, 0) , linewidth=2, title="Band Upper 12", display=display.all)
+pUpper13 = plot(upper_13, color=color.new(color3, 50), linewidth=1, title="Band Upper 13", display=display.all)
+pUpper14 = plot(upper_14, color=color.new(color3, 45), linewidth=1, title="Band Upper 14", display=display.all)
+pUpper15 = plot(upper_15, color=color.new(color3, 40), linewidth=1, title="Band Upper 15", display=display.all)
+pUpper16 = plot(upper_16, color=color.new(color3, 35), linewidth=1, title="Band Upper 16", display=display.all)
+pUpper17 = plot(upper_17, color=color.new(color3, 30), linewidth=1, title="Band Upper 17", display=display.all)
+pUpper18 = plot(upper_18, color=color.new(color3, 0), linewidth=3, title="Band Upper 18", display=display.all)
+
+pLower1  = plot(lower_1 , color=color.new(color1, 50), linewidth=1, title="Band Lower 1", display=display.all)
+pLower2  = plot(lower_2 , color=color.new(color1, 45), linewidth=1, title="Band Lower 2", display=display.all)
+pLower3  = plot(lower_3 , color=color.new(color1, 40), linewidth=1, title="Band Lower 3", display=display.all)
+pLower4  = plot(lower_4 , color=color.new(color1, 35), linewidth=1, title="Band Lower 4", display=display.all)
+pLower5  = plot(lower_5 , color=color.new(color1, 30), linewidth=1, title="Band Lower 5", display=display.all)
+pLower6  = plot(lower_6 , color=color.new(color1, 0) , linewidth=2, title="Band Lower 6", display=display.all)
+pLower7  = plot(lower_7 , color=color.new(color2, 50), linewidth=1, title="Band Lower 7", display=display.all)
+pLower8  = plot(lower_8 , color=color.new(color2, 45), linewidth=1, title="Band Lower 8", display=display.all)
+pLower9  = plot(lower_9 , color=color.new(color2, 40), linewidth=1, title="Band Lower 9", display=display.all)
+pLower10 = plot(lower_10, color=color.new(color2, 35), linewidth=1, title="Band Lower 10", display=display.all)
+pLower11 = plot(lower_11, color=color.new(color2, 30), linewidth=1, title="Band Lower 11", display=display.all)
+pLower12 = plot(lower_12, color=color.new(color2, 0) , linewidth=2, title="Band Lower 12", display=display.all)
+pLower13 = plot(lower_13, color=color.new(color3, 50), linewidth=1, title="Band Upper 13", display=display.all)
+pLower14 = plot(lower_14, color=color.new(color3, 45), linewidth=1, title="Band Upper 14", display=display.all)
+pLower15 = plot(lower_15, color=color.new(color3, 40), linewidth=1, title="Band Upper 15", display=display.all)
+pLower16 = plot(lower_16, color=color.new(color3, 35), linewidth=1, title="Band Upper 16", display=display.all)
+pLower17 = plot(lower_17, color=color.new(color3, 30), linewidth=1, title="Band Upper 17", display=display.all)
+pLower18 = plot(lower_18, color=color.new(color3, 0) , linewidth=3, title="Band Upper 18", display=display.all)
+
+fill(pBasis, pLower6, close <= basis and close >= lower_6 ? color.new(color1, 75) : na, 'Fill Level 1 Lower', display=display.all)
+fill(pLower6, pLower12, close <= lower_6 and close >= lower_12 ? color.new(color2, 75) : na, 'Fill Level 2 Lower', display=display.all)
+fill(pLower12, pLower18, close <= lower_12 and close >= lower_18 ? color.new(color3, 75) : na, 'Fill Level 3 Lower', display=display.all)
+
+fill(pBasis, pUpper6, close >= basis and close <= upper_6 ? color.new(color1, 75) : na, 'Fill Level 1 Upper', display=display.all)
+fill(pUpper6, pUpper12, close >= upper_6 and close <= upper_12 ? color.new(color2, 75) : na, 'Fill Level 2 Upper', display=display.all)
+fill(pUpper12, pUpper18, close >= upper_12 and close <= upper_18 ? color.new(color3, 75) : na, 'Fill Level 3 Upper', display=display.all)
+
+// ------------------------- }
+
+// ------------------------- Statistics {
+//--> Total bars
+var bars = 1
+if upper_12 != upper_12[1]
+    bars += 1
+
+//--> Bands
+// upper_6  = 1
+// upper_12 = 2
+// upper_18 = 3
+// basis
+// lower_6  = 1
+// lower_12 = 2
+// lower_18 = 3
+
+//--> Counts the bar between the bands
+// For upper bands I consider the price high
+// For lower bands I consider the price low
+
+// Between Basis and Band 1
+var u1 = 0.0
+if high >= basis and high <= upper_6
+    u1 += 1
+
+// Number that close between Band 1 and Band 2
+var u2 = 0.0
+if high >= upper_6 and high <= upper_12
+    u2 += 1
+    
+// Number that close between Band 2 and Band 3
+var u3 = 0.0
+if high >= upper_12 and high <= upper_18
+    u3 += 1
+
+// Number that close greater than Band 3
+// var u4 = 0.0
+// if high >= upper_18
+//     u4 += 1        
+
+// Number that close between Basis and Band 1
+var l1 = 0.0
+if low <= basis and low >= lower_6
+    l1 += 1
+
+// Number that close between Band 1 and Band 2
+var l2 = 0.0
+if low <= lower_6 and low >= lower_12
+    l2 += 1
+    
+// Number that close between Band 2 and Band 3
+var l3 = 0.0
+if low <= lower_12 and low >= lower_18
+    l3 += 1
+    
+// Number that close greater Band 3
+// var l4 = 0.0
+// if low <= lower_18
+//     l4 += 1        
+
+//probability
+
+p_u1 = u1/bars * 100
+p_l1 = l1/bars * 100
+
+p_u2 = u2/bars * 100
+p_l2 = l2/bars * 100
+
+p_u3 = u3/bars * 100
+p_l3 = l3/bars * 100
+
+// p_u4 = u4/bars * 100
+// p_l4 = l4/bars * 100
+
+var label label_u1 = na
+label.delete(label_u1)
+label_u1 := label.new(bar_index+20, upper_6, text=str.tostring(band6) + " :  " + str.tostring(p_u1,"#.##")+"%" + ' (' + str.tostring(u1) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+var label label_u2 = na
+label.delete(label_u2)
+label_u2 := label.new(bar_index+20, upper_12, text=str.tostring(band12) + " :  " + str.tostring(p_u2,"#.##")+"%" + ' (' + str.tostring(u2) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+var label label_u3 = na
+label.delete(label_u3)
+label_u3 := label.new(bar_index+20, upper_18, text=str.tostring(band18) + " :  " + str.tostring(p_u3,"#.##")+"%" + ' (' + str.tostring(u3) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+// var label label_u4 = na
+// label.delete(label_u4)
+// label_u4 := label.new(bar_index+20, upper_18+1000, text='>' + str.tostring(band18) + " :  " + str.tostring(p_u4,"#.##")+"%" + ' (' + str.tostring(u4) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+var label label_l1 = na
+label.delete(label_l1)
+label_l1 := label.new(bar_index+20, lower_6, text=str.tostring(-band6) + " :  " + str.tostring(p_l1,"#.##")+"%" + ' (' + str.tostring(l1) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+var label label_l2 = na
+label.delete(label_l2)
+label_l2 := label.new(bar_index+20, lower_12, text=str.tostring(-band12) + " :  " + str.tostring(p_l2,"#.##")+"%" + ' (' + str.tostring(l2) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+var label label_l3 = na
+label.delete(label_l3)
+label_l3 := label.new(bar_index+20, lower_18, text=str.tostring(-band18) + " :  " + str.tostring(p_l3,"#.##")+"%" + ' (' + str.tostring(l3) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+// var label label_l4 = na
+// label.delete(label_l4)
+// label_l4 := label.new(bar_index+20, lower_18-1000, text='<' + str.tostring(-band18) + " :  " + str.tostring(p_l4,"#.##")+"%" + ' (' + str.tostring(l4) + ')', style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+var label label_total = na
+label.delete(label_total)
+label_total := label.new(bar_index+20, basis, text="total bars : "+str.tostring(bars,"#"), style=label.style_label_left, color=na, textcolor=color.white,textalign=text.align_left)
+
+// ------------------------- }
