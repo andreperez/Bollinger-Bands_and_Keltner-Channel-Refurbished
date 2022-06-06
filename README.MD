@@ -20,7 +20,7 @@ In addition, I added the following resources:
 
 ## █ Concepts
 
-### Keltner Channels vs. Bollinger Bands**
+### Keltner Channels vs. Bollinger Bands
 
 "These two indicators are quite similar. Keltner Channels use ATR to calculate the upper and lower bands while Bollinger Bands use standard deviation instead.
 
