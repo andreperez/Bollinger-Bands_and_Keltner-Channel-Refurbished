@@ -6,44 +6,174 @@
 //      - TimeFliesBuy ("Triple Bollinger Bands")
 //      - Rashad ("Fibonacci Bollinger Bands")
 //      - Dicargo_Beam ("Is the Bollinger Bands assumption wrong?")
+//      - MightyZinger (Some Moving Averages)
+//      - CrackingCryptocurrency (MA's)
+//      - PineCoders (Benchmark)
+//      - paragjyoti2012 (debug)
+//      - Franklin Moormann (cheatcountry)
 
 indicator("Bollinger Bands + Keltner Channel Refurbished", shorttitle='BB+KC Refurbished', format=format.price, precision=2, overlay=true)
 
-// ------------------------- Constants {
-var string SMA          = 'Simple Moving Average'
-var string EMA          = 'Exponential Moving Average'
-var string REMA         = 'Regularized Exponential Moving Average'
-var string HMA          = 'Hull Moving Average'
-var string ALMA         = 'Arnaud Legoux Moving Average'
-var string WMA          = 'Weighted Moving Average'
-var string LSQ          = 'Least Squares Moving Average (Linear Regression)'
-var string VWMA         = 'Volume Weighted Moving Average'
-var string SMMA         = 'Smoothed Moving Average'
-var string MEDIAN       = 'Median'
-var string VWAP         = 'VWAP'
-var color color1        = color.gray
-var color color2        = color.blue
-var color color3        = color.purple
-// ------------------------- }
+import andre_007/MovingAveragesProxy/1 as MaProxy
 
-// ------------------------- Inputs {
+// ———————————————————————————————————————— Only for benchmark {
+// import PineCoders/LibraryStopwatch/1 as Stopwatch    // Only for debug
+// [timePerBarInMs, totalTimeInMs, barsTimed, barsNotTimed] = Stopwatch.stopwatchStats()
+// msElapsed = Stopwatch.stopwatch()
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Only for Debug {
+// import paragjyoti2012/LoggerLib/5 as Logger
+
+// var logger=Logger.init()
+// var logTable=Logger.initTable(logger, max_rows_count=15, offset=0, position='left', size='small', hide_date=false, stickyRows=0)
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Constants {
+// Moving Averages Types
+var string AARMA    = 'Adaptive Autonomous Recursive Moving Average'
+var string ADEMA    = '* Alpha-Decreasing Exponential Moving Average'
+var string AHMA     = 'Ahrens Moving Average'
+var string ALMA     = 'Arnaud Legoux Moving Average'
+var string ALSMA    = 'Adaptive Least Squares'
+var string AUTOL    = 'Auto-Line'
+var string CMA      = 'Corrective Moving average'
+var string CORMA    = 'Correlation Moving Average Price'
+var string COVWEMA  = 'Coefficient of Variation Weighted Exponential Moving Average'
+var string COVWMA   = 'Coefficient of Variation Weighted Moving Average'
+var string DEMA     = 'Double Exponential Moving Average'
+var string DONCHIAN = 'Donchian Middle Channel'
+var string EDMA     = 'Exponentially Deviating Moving Average'
+var string EDSMA    = 'Ehlers Dynamic Smoothed Moving Average'
+var string EFRAMA   = '* Ehlrs Modified Fractal Adaptive Moving Average'
+var string EHMA     = 'Exponential Hull Moving Average'
+var string EMA      = 'Exponential Moving Average'
+var string EPMA     = 'End Point Moving Average'
+var string ETMA     = 'Exponential Triangular Moving Average'
+var string EVWMA    = 'Elastic Volume Weighted Moving Average'
+var string FAMA     = 'Following Adaptive Moving Average'
+var string FIBOWMA  = 'Fibonacci Weighted Moving Average'
+var string FISHLSMA = 'Fisher Least Squares Moving Average'
+var string FRAMA    = 'Fractal Adaptive Moving Average'
+var string GMA      = 'Geometric Moving Average'
+var string HKAMA    = 'Hilbert based Kaufman\'s Adaptive Moving Average'
+var string HMA      = 'Hull Moving Average'
+var string JURIK    = 'Jurik Moving Average'
+var string KAMA     = 'Kaufman\'s Adaptive Moving Average'
+var string LC_LSMA  = '1LC-LSMA (1 line code lsma with 3 functions)'
+var string LEOMA    = 'Leo Moving Average'
+var string LINWMA   = 'Linear Weighted Moving Average'
+var string LSMA     = 'Least Squares Moving Average'
+var string MAMA     = 'MESA Adaptive Moving Average'
+var string MCMA     = 'McNicholl Moving Average'
+var string MEDIAN   = 'Median'
+var string REGMA    = 'Regularized Exponential Moving Average'
+var string REMA     = 'Range EMA'
+var string REPMA    = 'Repulsion Moving Average'
+var string RMA      = 'Relative Moving Average'
+var string RSIMA    = 'RSI Moving average'
+var string RVWAP    = '* Rolling VWAP'
+var string SMA      = 'Simple Moving Average'
+var string SMMA     = 'Smoothed Moving Average'
+var string SRWMA    = 'Square Root Weighted Moving Average'
+var string SW_MA    = 'Sine-Weighted Moving Average'
+var string SWMA     = '* Symmetrically Weighted Moving Average'
+var string TEMA     = 'Triple Exponential Moving Average'
+var string THMA     = 'Triple Hull Moving Average'
+var string TREMA    = 'Triangular Exponential Moving Average'
+var string TRSMA    = 'Triangular Simple Moving Average'
+var string TT3      = 'Tillson T3'
+var string VAMA     = 'Volatility Adjusted Moving Average'
+var string VIDYA    = 'Variable Index Dynamic Average'
+var string VWAP     = '* VWAP'
+var string VWMA     = 'Volume-weighted Moving Average'
+var string WMA      = 'Weighted Moving Average'
+var string WWMA     = 'Welles Wilder Moving Average'
+var string XEMA     = 'Optimized Exponential Moving Average'
+var string ZEMA     = 'Zero-Lag Exponential Moving Average'
+var string ZSMA     = 'Zero-Lag Simple Moving Average'
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Inputs {
 src = input.source(defval=close, title='Source', inline='1')
 
 var string typeIndicator = input.string(defval='Bollinger Bands', title='Indicator',
-  options=['Bollinger Bands', 'Keltner Channel'],
-  inline='1')
+  options=['Bollinger Bands', 'Keltner Channel'], inline='1')
+  
+var string stDevSrc = input.string(defval='Price', title='Standard Deviation Source',
+  options=['Price', 'MA'], inline='1', tooltip='Only for Bollinger Bands')
 
-var string typeMa = input.string(defval=REMA, title='MA',
-  options=[SMA, EMA, REMA, HMA, ALMA, WMA, LSQ, VWMA, SMMA, MEDIAN, VWAP],
+var string typeMa = input.string(defval=REGMA, title='MA',
+  options=[AARMA,ALSMA,AHMA,ADEMA,ALMA,AUTOL,COVWEMA,COVWMA,CMA,CORMA,DEMA,DONCHIAN,EFRAMA,EDSMA,EVWMA,EPMA,EDMA,EHMA,EMA,ETMA,FIBOWMA,FISHLSMA,FAMA,FRAMA,GMA,HKAMA,HMA,JURIK,KAMA,LC_LSMA,LEOMA,LSMA,LINWMA,MEDIAN,MAMA,MCMA,XEMA,REMA,REGMA,RMA,REPMA,RVWAP,RSIMA,SMA,SW_MA,SRWMA,SMMA,SWMA,TT3,TREMA,TRSMA,TEMA,THMA,VIDYA,VAMA,VWAP,WMA,WWMA,ZEMA,ZSMA],
   inline='2')
 
-length = input.int(200, minval=1, inline='2', title='Length')
+length = input.int(200, minval=1, inline='2', title='Length', tooltip='For moving averages with * the length parameter does not apply')
   
-multiplier = input.float(1, minval=0.001, maxval=10, title='Multiplier', inline='2')
+multiplier = input.float(1, minval=0.001, title='Multiplier', inline='2')
 
 bandsStyleKC = input.string("Average True Range", options = ["Average True Range", "True Range", "Range"], title="Bands Style", inline='3', group='Exclusive for Keltner Channel')
 
 atrlength = input(10, "ATR Length", inline='3', group='Exclusive for Keltner Channel')
+
+// ————————————————— Parameters exclusive for some MA's {
+var string GRP_AARMA = 'Adaptive Autonomous Recursive Moving Average'
+var float gamma_aarma = input.float(3, "Gamma", group=GRP_AARMA)
+
+var string GRP_ALSMA = 'Adaptive Least Squares Moving Average'
+var float smooth = input.float(1.5, "Smooth", group=GRP_ALSMA)
+
+var string GROUP_ALMA = 'Arnaud Legoux Moving Average (ALMA)'
+var string TOOLTIP_ALMA = '◆ Offset: this is considered in the formula, not in the graphic! Offset is the Gaussian applied to the combo line and it is 0.85 by default.\nSetting offset at 1 makes it fully aligned to the current price just like the exponential moving average.\nWhile setting it to zero makes it just like a simple moving average.\nTraders may try offset combinations according to their own needs and preferences.\n\n◆ Sigma: the standard deviation applied to the combo line. It makes the combo line sharper.'
+var string TOOLTIP_COLOR_AVERAGE = 'Examples:\n🟩 Moving average 1 > moving average 2 is defined by green.\n🟥 Moving average 1 < moving average 2 is defined by red.'
+inputAlmaOffset = input.float(title='Offset', defval=0.85, group=GROUP_ALMA, inline='04') 
+inputAlmaSigma  = input.float(title='Sigma', defval=6, group=GROUP_ALMA, inline='04', tooltip=TOOLTIP_ALMA)
+
+var string GRP_CORR = 'Correlation Moving Average'
+var string GRP_CORR_TOOLTIP = 'Number multiplied after calculating correlation + standard deviation.'
+var float factor = input.float(1.7, "Factor", group=GRP_CORR, tooltip=GRP_CORR_TOOLTIP) 
+
+var string GRP_EHLR = 'Ehlrs Modified Fractal Adaptive Moving Average'
+var int fc = input.int(8, 'Lower Shift Limit', group=GRP_EHLR)
+var int sc = input.int(8, 'Upper Shift Limit', group=GRP_EHLR)
+
+var string GRP_EPMA = 'End Point Moving Average'
+offset_epma = input.int(title="Offset", defval=4, group=GRP_EPMA)
+
+var string GRP_JURIK = 'Jurik Moving Average'
+var int jurik_phase = input.int(3, "Phase", group=GRP_JURIK)
+var int jurik_power = input.int(1, "Power", group=GRP_JURIK)
+
+var string GRP_LWMA = 'Linear Weighted Moving Average'
+lwma_weight = input.int(6, title = "Weight", minval=1, step=1, group=GRP_LWMA)
+
+var string GRP_REGMA = 'Regularized Exponential Moving Average'
+var string GRP_REGMA_TOOLTIP = 'A factor that controls the \"regularization\" amount. When the Lambda value is set to zero, the Regularized Exponential Moving Average becomes the standard EMA.'
+var float lambda = input.float(0.5, "Lambda", group=GRP_REGMA, tooltip=GRP_REGMA_TOOLTIP) 
+
+var string GRP_RVWAP = 'Rolling VWAP'
+var string TT_WINDOW = "By default, the time period used to calculate the RVWAP automatically adjusts with the chart's timeframe.
+  Check this to use a fixed-size time period instead, which you define with the following three values."
+var string TT_MINBARS = "The minimum number of last values to keep in the moving window, even if these values are outside the time period.
+  This avoids situations where a large time gap between two bars would cause the time window to be empty."
+
+bool _fixedTfInput = input.bool(false, "Use a fixed time period", group = GRP_RVWAP, tooltip = TT_WINDOW, inline='1')
+int  _daysInput    = input.int(1, "Days", minval = 0, maxval = 90, group = GRP_RVWAP, inline='2') 
+int  _hoursInput   = input.int(0, "Hours", minval = 0, maxval = 23, group = GRP_RVWAP, inline='2') 
+int  _minsInput    = input.int(0, "Minutes", minval = 0, maxval = 59, group = GRP_RVWAP, inline='2')
+int  _minBarsInput = input.int(10, "Bars", group = GRP_RVWAP, tooltip = TT_MINBARS, inline='3')
+
+var string GRP_T3 = 'Tillson T3'
+var float a1_t3 = input.float(0.7, 'Volume factor', group=GRP_T3)
+
+var string GRP_VADMA = 'Volatility Adjusted Moving Average'
+var string GRP_VADMA_TOOLTIP = 'Volatility loopback'
+var int volatility_lookback = input.int(10, 'Loopback', minval=1, step=1, group=GRP_VADMA, tooltip=GRP_VADMA_TOOLTIP)
+
+var string GRP_VWMA = 'Volume Weighted Moving Average'
+var string GRP_VWMA_TOOLTIP = 'The most common "Volume Weighted Moving Average" is a Simple Moving Average of Price x Volume, divided by Simple Moving Average of Volume. \n' + 
+  'Enabling this checkbox, it\'s possible to have other types and less common moving averages weighted by volume, for example, Exponencial Volume Weighted Moving Average, Alma Volume Weighted Moving Average, etc...'
+applyVolumeWeighted = input.bool(title="Volume Weighted Moving Average?", defval=false, group=GRP_VWMA, tooltip=GRP_VWMA_TOOLTIP)
+// ————————————————— }
 
 band1  = input.float(0.236, minval=0.001, maxval=10, step=0.2, title='Band 1', inline='5', group='Bands')
 band2  = input.float(0.382, minval=0.001, maxval=10, step=0.2, title='Band 2', inline='5', group='Bands')
@@ -71,149 +201,169 @@ band16 = input.float(2.618, minval=0.001, maxval=10, step=0.2, title='Band 16', 
 
 band17 = input.float(2.786, minval=0.001, maxval=10, step=0.2, title='Band 17', inline='13', group='Bands')
 band18 = input.float(3, minval=0.001, maxval=10, step=0.2, title='Band 18', inline='13', group='Bands')
-// ------------------------- }
 
+var string GROUP_AVERAGE_COLORS = 'Colors and theme'
+var string inputFill = input.string(title='Fill background between bands?', options=['Always', 'When price inside channel', 'Never'], group=GROUP_AVERAGE_COLORS, defval='When price inside channel')
+var color colorBandUp1      = input.color(color.new(#a8dd76, 0), 'Upper band 1', group=GROUP_AVERAGE_COLORS, inline='UP')
+var color colorBandUp2      = input.color(color.new(#4caf50, 0), 'Upper band 2', group=GROUP_AVERAGE_COLORS, inline='UP')
+var color colorBandUp3      = input.color(color.new(#126d0e, 0), 'Upper band 3', group=GROUP_AVERAGE_COLORS, inline='UP')
+var color colorBandDown1    = input.color(color.new(#f77c80, 0), 'Lower band 1', group=GROUP_AVERAGE_COLORS, inline='DOWN')
+var color colorBandDown2    = input.color(color.new(#d12a35, 0), 'Lower band 2', group=GROUP_AVERAGE_COLORS, inline='DOWN')
+var color colorBandDown3    = input.color(color.new(#801a23, 0), 'Lower band 3', group=GROUP_AVERAGE_COLORS, inline='DOWN')
+var inputColorFillTransparency = input.int(defval=80 , title="Transparency for fill", minval=0, maxval=100, group=GROUP_AVERAGE_COLORS)
 
-// ------------------------- Moving Average {
-// The Regularized Exponential Moving Average or Regularized EMA is a trading indicator introduced by Chris Satchwell in July 2003 version of Stock & Commodities magazine.
-// This technical analysis indicator was designed to be smoother and with less lag that the traditional exponential moving average. 
-// The indicator gets the EMA period and the Lambda value (A factor that controls the "regularization" amount). 
-// When the Lambda value is set to zero, the Regularized Exponential Moving Average becomes the standard EMA.
-// The first argument of the Regularized EMA function gets the price series that will be smoothed. 
-// Usually, the close price is used but you can also use and calculate the Regularized EMA of any other price series or technical indicators.
-// lambda = input(title="Regularization Constant", type=float, minval=0, defval=0.5)
-rema(float src, simple int len, simple float lambda=0.5) =>
-    alpha = 2 / (len + 1)
-    ma = 0.0
-    ma := (nz(ma[1]) + alpha * (src - nz(ma[1])) + lambda * (2 * nz(ma[1]) - nz(ma[2]))) / (lambda + 1)
-    
-// @function Smoothed Moving Average.
-smma(float src = close, simple int len) =>
-    smma = float(0.0)
-    smaval = ta.sma(ta.sma(src, len), len)
-    smma := na(smma[1]) ? smaval : (smma[1] * (len - 1) + src) / len    
+var bool inputChangeColor = input.bool(title='Change base color when bullish/\bearish?', defval=false, group=GROUP_AVERAGE_COLORS)
+color inputColorBull = input.color(color.new(#a8dd76, 0), 'Bull', group=GROUP_AVERAGE_COLORS, inline='Base')
+color inputColorBear = input.color(color.new(#f77c80, 0), 'Bear', group=GROUP_AVERAGE_COLORS, inline='Base')
+var color colorDefault = input.color(color.new(color.white, 0), 'Default', group=GROUP_AVERAGE_COLORS, inline='Base') 
+// ———————————————————————————————————————— }
 
-fCalcMa(series float src, simple string type, simple int len) =>
-    maRet = switch type
-        SMA => ta.sma(src, len)
-        EMA => ta.ema(src, len)
-        REMA => rema(src, len)
-        HMA => ta.hma(src, len)
-        ALMA => ta.alma(src, len, 0.85, 6, false)
-        WMA => ta.wma(src, len)
-        LSQ => ta.linreg(src, len, 0)
-        SMMA => smma(src, len)    
-        VWMA => ta.vwma(src, len)
-        MEDIAN => ta.median(src, len)
-        VWAP => ta.vwap(src)
-// ------------------------- }
+// ———————————————————————————————————————— Error Handling {
+// For VWAP: stop the indicator on charts with no volume
+if (typeMa == VWAP or typeMa == RVWAP) and barstate.islast and ta.cum(nz(volume)) == 0
+    runtime.error("No volume is provided by the data vendor.")
+// ———————————————————————————————————————— }
 
-// ------------------------- Calcs {
-basis = fCalcMa(src, typeMa, length)
+// ———————————————————————————————————————— Calcs {
+basis = MaProxy.getMovingAverage(
+  type=typeMa, src=src, len=length,
+  lsmaOffset=0,
+  inputAlmaOffset=inputAlmaOffset, inputAlmaSigma=inputAlmaSigma, 
+  FC=fc, SC=sc, 
+  a1_t3=a1_t3,
+  fixedTfInput=_fixedTfInput, daysInput=_daysInput, hoursInput=_hoursInput, minsInput=_minsInput, minBarsInput=_minBarsInput,
+  lambda=lambda,
+  factor=factor,
+  offset_epma=offset_epma,
+  volumeWeighted=applyVolumeWeighted,
+  gamma_aarma=gamma_aarma,
+  smooth=smooth,
+  linweight=lwma_weight,
+  volatility_lookback=volatility_lookback,
+  jurik_phase=jurik_phase,
+  jurik_power=jurik_power)
+
 float rangeMA = na
 
 deviation = if typeIndicator == 'Bollinger Bands'
-    multiplier * ta.stdev(src, length)
+    multiplier * ta.stdev(stDevSrc == 'Price' ? src : basis, length)
 else    // 'Keltner Channel'
     rangeMA := bandsStyleKC == "True Range" ? ta.tr(true) : bandsStyleKC == "Average True Range" ? ta.atr(atrlength) : ta.rma(high - low, length)
     multiplier * rangeMA
 
-
 upper_1  = basis + (band1*deviation)
-upper_2  = basis + (band2*deviation)
+// upper_2  = basis + (band2*deviation)
 upper_3  = basis + (band3*deviation)
-upper_4  = basis + (band4*deviation)
+// upper_4  = basis + (band4*deviation)
 upper_5  = basis + (band5*deviation)
 upper_6  = basis + (band6*deviation)
 upper_7  = basis + (band7*deviation)
-upper_8  = basis + (band8*deviation)
+// upper_8  = basis + (band8*deviation)
 upper_9  = basis + (band9*deviation)
-upper_10 = basis + (band10*deviation)
+// upper_10 = basis + (band10*deviation)
 upper_11 = basis + (band11*deviation)
 upper_12 = basis + (band12*deviation)
 upper_13 = basis + (band13*deviation)
-upper_14 = basis + (band14*deviation)
+// upper_14 = basis + (band14*deviation)
 upper_15 = basis + (band15*deviation)
-upper_16 = basis + (band16*deviation)
+// upper_16 = basis + (band16*deviation)
 upper_17 = basis + (band17*deviation)
 upper_18 = basis + (band18*deviation)
 
 lower_1  = basis - (band1*deviation)
-lower_2  = basis - (band2*deviation)
+// lower_2  = basis - (band2*deviation)
 lower_3  = basis - (band3*deviation)
-lower_4  = basis - (band4*deviation)
+// lower_4  = basis - (band4*deviation)
 lower_5  = basis - (band5*deviation)
 lower_6  = basis - (band6*deviation)
 lower_7  = basis - (band7*deviation)
-lower_8  = basis - (band8*deviation)
+// lower_8  = basis - (band8*deviation)
 lower_9  = basis - (band9*deviation)
-lower_10 = basis - (band10*deviation)
+// lower_10 = basis - (band10*deviation)
 lower_11 = basis - (band11*deviation)
 lower_12 = basis - (band12*deviation)
 lower_13 = basis - (band13*deviation)
-lower_14 = basis - (band14*deviation)
+// lower_14 = basis - (band14*deviation)
 lower_15 = basis - (band15*deviation)
-lower_16 = basis - (band16*deviation)
+// lower_16 = basis - (band16*deviation)
 lower_17 = basis - (band17*deviation)
 lower_18 = basis - (band18*deviation)
+// ———————————————————————————————————————— }
 
-// ------------------------- }
+// ———————————————————————————————————————— Functions {
+f_changeLineColor(series float _line) =>
+    color _color = if inputChangeColor
+        if src >= _line
+            inputColorBull
+        else
+            inputColorBear
+    else
+        colorDefault
+        
+// f_FillBackground() =>
+//     switch inputFill == 'When price inside channel' => 
+//         'Always'
+        
+// ———————————————————————————————————————— }
 
-// ------------------------- Plots {
-pBasis = plot(basis, color=color.white, linewidth=3)
+// ———————————————————————————————————————— Plots {
+pBasis = plot(basis, title='Moving Average', color=f_changeLineColor(basis), linewidth=3)
 
-pUpper1  = plot(upper_1 , color=color.new(color1, 50), linewidth=1, title="Band Upper 1", display=display.all)
-pUpper2  = plot(upper_2 , color=color.new(color1, 45), linewidth=1, title="Band Upper 2", display=display.all)
-pUpper3  = plot(upper_3 , color=color.new(color1, 40), linewidth=1, title="Band Upper 3", display=display.all)
-pUpper4  = plot(upper_4 , color=color.new(color1, 35), linewidth=1, title="Band Upper 4", display=display.all)
-pUpper5  = plot(upper_5 , color=color.new(color1, 30), linewidth=1, title="Band Upper 5", display=display.all)
-pUpper6  = plot(upper_6 , color=color.new(color1, 0) , linewidth=2, title="Band Upper 6", display=display.all)
-pUpper7  = plot(upper_7 , color=color.new(color2, 50), linewidth=1, title="Band Upper 7", display=display.all)
-pUpper8  = plot(upper_8 , color=color.new(color2, 45), linewidth=1, title="Band Upper 8", display=display.all)
-pUpper9  = plot(upper_9 , color=color.new(color2, 40), linewidth=1, title="Band Upper 9", display=display.all)
-pUpper10 = plot(upper_10, color=color.new(color2, 35), linewidth=1, title="Band Upper 10", display=display.all)
-pUpper11 = plot(upper_11, color=color.new(color2, 30), linewidth=1, title="Band Upper 11", display=display.all)
-pUpper12 = plot(upper_12, color=color.new(color2, 0) , linewidth=2, title="Band Upper 12", display=display.all)
-pUpper13 = plot(upper_13, color=color.new(color3, 50), linewidth=1, title="Band Upper 13", display=display.all)
-pUpper14 = plot(upper_14, color=color.new(color3, 45), linewidth=1, title="Band Upper 14", display=display.all)
-pUpper15 = plot(upper_15, color=color.new(color3, 40), linewidth=1, title="Band Upper 15", display=display.all)
-pUpper16 = plot(upper_16, color=color.new(color3, 35), linewidth=1, title="Band Upper 16", display=display.all)
-pUpper17 = plot(upper_17, color=color.new(color3, 30), linewidth=1, title="Band Upper 17", display=display.all)
-pUpper18 = plot(upper_18, color=color.new(color3, 0), linewidth=3, title="Band Upper 18", display=display.all)
+pUpper1  = plot(upper_1 , color=color.new(colorBandUp1, 50), linewidth=1, title="Band Upper 1", display=display.all)
+// pUpper2  = plot(upper_2 , color=color.new(colorBandUp1, 45), linewidth=1, title="Band Upper 2", display=display.none)
+pUpper3  = plot(upper_3 , color=color.new(colorBandUp1, 40), linewidth=1, title="Band Upper 3", display=display.all)
+// pUpper4  = plot(upper_4 , color=color.new(colorBandUp1, 35), linewidth=1, title="Band Upper 4", display=display.none)
+pUpper5  = plot(upper_5 , color=color.new(colorBandUp1, 30), linewidth=1, title="Band Upper 5", display=display.all)
+pUpper6  = plot(upper_6 , color=color.new(colorBandUp1, 0) , linewidth=2, title="Band Upper 6", display=display.all)
 
-pLower1  = plot(lower_1 , color=color.new(color1, 50), linewidth=1, title="Band Lower 1", display=display.all)
-pLower2  = plot(lower_2 , color=color.new(color1, 45), linewidth=1, title="Band Lower 2", display=display.all)
-pLower3  = plot(lower_3 , color=color.new(color1, 40), linewidth=1, title="Band Lower 3", display=display.all)
-pLower4  = plot(lower_4 , color=color.new(color1, 35), linewidth=1, title="Band Lower 4", display=display.all)
-pLower5  = plot(lower_5 , color=color.new(color1, 30), linewidth=1, title="Band Lower 5", display=display.all)
-pLower6  = plot(lower_6 , color=color.new(color1, 0) , linewidth=2, title="Band Lower 6", display=display.all)
-pLower7  = plot(lower_7 , color=color.new(color2, 50), linewidth=1, title="Band Lower 7", display=display.all)
-pLower8  = plot(lower_8 , color=color.new(color2, 45), linewidth=1, title="Band Lower 8", display=display.all)
-pLower9  = plot(lower_9 , color=color.new(color2, 40), linewidth=1, title="Band Lower 9", display=display.all)
-pLower10 = plot(lower_10, color=color.new(color2, 35), linewidth=1, title="Band Lower 10", display=display.all)
-pLower11 = plot(lower_11, color=color.new(color2, 30), linewidth=1, title="Band Lower 11", display=display.all)
-pLower12 = plot(lower_12, color=color.new(color2, 0) , linewidth=2, title="Band Lower 12", display=display.all)
-pLower13 = plot(lower_13, color=color.new(color3, 50), linewidth=1, title="Band Upper 13", display=display.all)
-pLower14 = plot(lower_14, color=color.new(color3, 45), linewidth=1, title="Band Upper 14", display=display.all)
-pLower15 = plot(lower_15, color=color.new(color3, 40), linewidth=1, title="Band Upper 15", display=display.all)
-pLower16 = plot(lower_16, color=color.new(color3, 35), linewidth=1, title="Band Upper 16", display=display.all)
-pLower17 = plot(lower_17, color=color.new(color3, 30), linewidth=1, title="Band Upper 17", display=display.all)
-pLower18 = plot(lower_18, color=color.new(color3, 0) , linewidth=3, title="Band Upper 18", display=display.all)
+pUpper7  = plot(upper_7 , color=color.new(colorBandUp2, 50), linewidth=1, title="Band Upper 7", display=display.all)
+// pUpper8  = plot(upper_8 , color=color.new(colorBandUp2, 45), linewidth=1, title="Band Upper 8", display=display.none)
+pUpper9  = plot(upper_9 , color=color.new(colorBandUp2, 40), linewidth=1, title="Band Upper 9", display=display.all)
+// pUpper10 = plot(upper_10, color=color.new(colorBandUp2, 35), linewidth=1, title="Band Upper 10", display=display.none)
+pUpper11 = plot(upper_11, color=color.new(colorBandUp2, 30), linewidth=1, title="Band Upper 11", display=display.all)
+pUpper12 = plot(upper_12, color=color.new(colorBandUp2, 0) , linewidth=2, title="Band Upper 12", display=display.all)
 
-fill(pBasis, pLower6, close <= basis and close >= lower_6 ? color.new(color1, 70) : na, 'Fill Level 1 Lower', display=display.all)
-fill(pLower6, pLower12, close <= lower_6 and close >= lower_12 ? color.new(color2, 70) : na, 'Fill Level 2 Lower', display=display.all)
-fill(pLower12, pLower18, close <= lower_12 and close >= lower_18 ? color.new(color3, 70) : na, 'Fill Level 3 Lower', display=display.all)
+pUpper13 = plot(upper_13, color=color.new(colorBandUp3, 50), linewidth=1, title="Band Upper 13", display=display.all)
+// pUpper14 = plot(upper_14, color=color.new(colorBandUp3, 45), linewidth=1, title="Band Upper 14", display=display.none)
+pUpper15 = plot(upper_15, color=color.new(colorBandUp3, 40), linewidth=1, title="Band Upper 15", display=display.all)
+// pUpper16 = plot(upper_16, color=color.new(colorBandUp3, 35), linewidth=1, title="Band Upper 16", display=display.none)
+pUpper17 = plot(upper_17, color=color.new(colorBandUp3, 30), linewidth=1, title="Band Upper 17", display=display.all)
+pUpper18 = plot(upper_18, color=color.new(colorBandUp3, 0), linewidth=3, title="Band Upper 18", display=display.all)
 
-fill(pBasis, pUpper6, close >= basis and close <= upper_6 ? color.new(color1, 70) : na, 'Fill Level 1 Upper', display=display.all)
-fill(pUpper6, pUpper12, close >= upper_6 and close <= upper_12 ? color.new(color2, 70) : na, 'Fill Level 2 Upper', display=display.all)
-fill(pUpper12, pUpper18, close >= upper_12 and close <= upper_18 ? color.new(color3, 70) : na, 'Fill Level 3 Upper', display=display.all)
+pLower1  = plot(lower_1 , color=color.new(colorBandDown1, 50), linewidth=1, title="Band Lower 1", display=display.all)
+// pLower2  = plot(lower_2 , color=color.new(colorBandDown1, 45), linewidth=1, title="Band Lower 2", display=display.none)
+pLower3  = plot(lower_3 , color=color.new(colorBandDown1, 40), linewidth=1, title="Band Lower 3", display=display.all)
+// pLower4  = plot(lower_4 , color=color.new(colorBandDown1, 35), linewidth=1, title="Band Lower 4", display=display.none)
+pLower5  = plot(lower_5 , color=color.new(colorBandDown1, 30), linewidth=1, title="Band Lower 5", display=display.all)
+pLower6  = plot(lower_6 , color=color.new(colorBandDown1, 0) , linewidth=2, title="Band Lower 6", display=display.all)
 
-// ------------------------- }
+pLower7  = plot(lower_7 , color=color.new(colorBandDown2, 50), linewidth=1, title="Band Lower 7", display=display.all)
+// pLower8  = plot(lower_8 , color=color.new(colorBandDown2, 45), linewidth=1, title="Band Lower 8", display=display.none)
+pLower9  = plot(lower_9 , color=color.new(colorBandDown2, 40), linewidth=1, title="Band Lower 9", display=display.all)
+// pLower10 = plot(lower_10, color=color.new(colorBandDown2, 35), linewidth=1, title="Band Lower 10", display=display.none)
+pLower11 = plot(lower_11, color=color.new(colorBandDown2, 30), linewidth=1, title="Band Lower 11", display=display.all)
+pLower12 = plot(lower_12, color=color.new(colorBandDown2, 0) , linewidth=2, title="Band Lower 12", display=display.all)
 
-// ------------------------- Statistics {
+pLower13 = plot(lower_13, color=color.new(colorBandDown3, 50), linewidth=1, title="Band Upper 13", display=display.all)
+// pLower14 = plot(lower_14, color=color.new(colorBandDown3, 45), linewidth=1, title="Band Upper 14", display=display.none)
+pLower15 = plot(lower_15, color=color.new(colorBandDown3, 40), linewidth=1, title="Band Upper 15", display=display.all)
+// pLower16 = plot(lower_16, color=color.new(colorBandDown3, 35), linewidth=1, title="Band Upper 16", display=display.none)
+pLower17 = plot(lower_17, color=color.new(colorBandDown3, 30), linewidth=1, title="Band Upper 17", display=display.all)
+pLower18 = plot(lower_18, color=color.new(colorBandDown3, 0) , linewidth=3, title="Band Upper 18", display=display.all)
+
+fill(pBasis, pUpper6, (inputFill == 'When price inside channel' and src >= basis and src <= upper_6) or (inputFill == 'Always') ? color.new(colorBandUp1, inputColorFillTransparency) : na, 'Fill Level 1 Upper', display=display.all)
+fill(pUpper6, pUpper12, (inputFill == 'When price inside channel' and src >= upper_6 and src <= upper_12) or (inputFill == 'Always') ? color.new(colorBandUp2, inputColorFillTransparency) : na, 'Fill Level 2 Upper', display=display.all)
+fill(pUpper12, pUpper18, (inputFill == 'When price inside channel' and src >= upper_12 and src <= upper_18) or (inputFill == 'Always') ? color.new(colorBandUp3, inputColorFillTransparency) : na, 'Fill Level 3 Upper', display=display.all)
+
+fill(pBasis, pLower6, (inputFill == 'When price inside channel' and src <= basis and src >= lower_6) or (inputFill == 'Always') ? color.new(colorBandDown1, inputColorFillTransparency) : na, 'Fill Level 1 Lower', display=display.all)
+fill(pLower6, pLower12, (inputFill == 'When price inside channel'  and src <= lower_6 and src >= lower_12) or (inputFill == 'Always') ? color.new(colorBandDown2, inputColorFillTransparency) : na, 'Fill Level 2 Lower', display=display.all)
+fill(pLower12, pLower18, (inputFill == 'When price inside channel'  and src <= lower_12 and src >= lower_18) or (inputFill == 'Always') ? color.new(colorBandDown3, inputColorFillTransparency) : na, 'Fill Level 3 Lower', display=display.all)
+// ———————————————————————————————————————— }
+
+// ———————————————————————————————————————— Statistics {
 //--> Total bars
 var bars = 0
-if upper_6 != upper_6[1]
+if (not na(upper_6))
     bars += 1
     
 //--> Bands
@@ -284,32 +434,41 @@ p_l4 = l4/bars * 100
 //--> Labels
 var label label_u1 = na
 label.delete(label_u1)
-label_u1 := label.new(bar_index+25, upper_6, text=str.tostring(p_u1,"#.##")+"%" + ' (' + str.tostring(u1) + ')', style=label.style_label_left, color=na, textcolor=color1, textalign=text.align_left)
+label_u1 := label.new(bar_index+25, upper_6, text=str.tostring(p_u1,"#.##")+"%" + ' (' + str.tostring(u1) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp1, textalign=text.align_left)
 
 var label label_u2 = na
 label.delete(label_u2)
-label_u2 := label.new(bar_index+25, upper_12, text=str.tostring(p_u2,"#.##")+"%" + ' (' + str.tostring(u2) + ')', style=label.style_label_left, color=na, textcolor=color2, textalign=text.align_left)
+label_u2 := label.new(bar_index+25, upper_12, text=str.tostring(p_u2,"#.##")+"%" + ' (' + str.tostring(u2) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp2, textalign=text.align_left)
 
 var label label_u3 = na
 label.delete(label_u3)
 label_u3 := label.new(bar_index+25, upper_18, text=str.tostring(p_u3,"#.##")+"%" + ' (' + str.tostring(u3) + ')' + 
-  '     Outer: ' + str.tostring(p_u4,"#.##")+"%" + ' (' + str.tostring(u4) + ')', style=label.style_label_left, color=na, textcolor=color3, textalign=text.align_left)
+  '     Out: ' + str.tostring(p_u4,"#.##")+"%" + ' (' + str.tostring(u4) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp3, textalign=text.align_left)
 
 var label label_l1 = na
 label.delete(label_l1)
-label_l1 := label.new(bar_index+25, lower_6, text=str.tostring(p_l1,"#.##")+"%" + ' (' + str.tostring(l1) + ')', style=label.style_label_left, color=na, textcolor=color1, textalign=text.align_left)
+label_l1 := label.new(bar_index+25, lower_6, text=str.tostring(p_l1,"#.##")+"%" + ' (' + str.tostring(l1) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown1, textalign=text.align_left)
 
 var label label_l2 = na
 label.delete(label_l2)
-label_l2 := label.new(bar_index+25, lower_12, text=str.tostring(p_l2,"#.##")+"%" + ' (' + str.tostring(l2) + ')', style=label.style_label_left, color=na, textcolor=color2, textalign=text.align_left)
+label_l2 := label.new(bar_index+25, lower_12, text=str.tostring(p_l2,"#.##")+"%" + ' (' + str.tostring(l2) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown2, textalign=text.align_left)
 
 var label label_l3 = na
 label.delete(label_l3)
 label_l3 := label.new(bar_index+25, lower_18, text=str.tostring(p_l3,"#.##")+"%" + ' (' + str.tostring(l3) + ')' + 
-  '     Outer: ' + str.tostring(p_l4,"#.##")+"%" + ' (' + str.tostring(l4) + ')', style=label.style_label_left, color=na, textcolor=color3, textalign=text.align_left)
+  '     Out: ' + str.tostring(p_l4,"#.##")+"%" + ' (' + str.tostring(l4) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown3, textalign=text.align_left)
 
 var label label_total = na
 label.delete(label_total)
 label_total := label.new(bar_index+25, basis, text="Total bars : "+str.tostring(bars,"#"), style=label.style_label_left, color=na, textcolor=color.white, textalign=text.align_left)
+// ———————————————————————————————————————— }
 
-// ------------------------- }
+// ———————————————————————————————————————— Only for benchmark {
+// Print table at the end of chart
+// if barstate.islast
+//     var table t = table.new(position.middle_right, 1, 1)
+//     var txt = str.tostring(timePerBarInMs, "ms/bar: #.######\n") +
+//       str.tostring(totalTimeInMs, "Total time (ms): #,###.######\n") + 
+//       str.tostring(barsTimed + barsNotTimed, "Bars analyzed: #")
+//     table.cell(t, 0, 0, txt, bgcolor = color.yellow, text_halign = text.align_right)
+// ———————————————————————————————————————— }
