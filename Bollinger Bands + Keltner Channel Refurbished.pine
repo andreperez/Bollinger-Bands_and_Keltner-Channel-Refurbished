@@ -175,32 +175,23 @@ var string GRP_VWMA_TOOLTIP = 'The most common "Volume Weighted Moving Average" 
 applyVolumeWeighted = input.bool(title="Volume Weighted Moving Average?", defval=false, group=GRP_VWMA, tooltip=GRP_VWMA_TOOLTIP)
 // ————————————————— }
 
-band1  = input.float(0.236, minval=0.001, maxval=10, step=0.2, title='Band 1', inline='5', group='Bands')
-band2  = input.float(0.382, minval=0.001, maxval=10, step=0.2, title='Band 2', inline='5', group='Bands')
+band1   = input.float(0.236, minval=0.000, maxval=10, step=0.2, title='Band 1', inline='1', group='Bands')
+band2   = input.float(0.5, minval=0.000, maxval=10, step=0.2, title='Band 2', inline='1', group='Bands', tooltip='Enter zero if you don\'t want a certain band to appear')
 
-band3  = input.float(0.5, minval=0.001, maxval=10, step=0.2, title='Band 3', inline='6', group='Bands')
-band4  = input.float(0.618, minval=0.001, maxval=10, step=0.2, title='Band 4', inline='6', group='Bands')
+band3   = input.float(0.786, minval=0.000, maxval=10, step=0.2, title='Band 3', inline='2', group='Bands')
+band4   = input.float(1, minval=0.000, maxval=10, step=0.2, title='Band 4', inline='2', group='Bands')
 
-band5  = input.float(0.786, minval=0.001, maxval=10, step=0.2, title='Band 5', inline='7', group='Bands')
-band6  = input.float(1, minval=0.001, maxval=10, step=0.2, title='Band 6', inline='7', group='Bands')
+band5   = input.float(1.236, minval=0.000, maxval=10, step=0.2, title='Band 5', inline='3', group='Bands')
+band6   = input.float(1.5, minval=0.000, maxval=10, step=0.2, title='Band 6', inline='3', group='Bands')
 
-band7  = input.float(1.236, minval=0.001, maxval=10, step=0.2, title='Band 7', inline='8', group='Bands')
-band8  = input.float(1.382, minval=0.001, maxval=10, step=0.2, title='Band 8', inline='8', group='Bands')
+band7   = input.float(1.786, minval=0.000, maxval=10, step=0.2, title='Band 7', inline='4', group='Bands')
+band8   = input.float(2, minval=0.000, maxval=10, step=0.2, title='Band 8', inline='4', group='Bands')
 
-band9  = input.float(1.5, minval=0.001, maxval=10, step=0.2, title='Band 9', inline='9', group='Bands')
-band10 = input.float(1.618, minval=0.001, maxval=10, step=0.2, title='Band 10', inline='9', group='Bands')
+band9   = input.float(2.236, minval=0.000, maxval=10, step=0.2, title='Band 9', inline='5', group='Bands')
+band10  = input.float(2.5, minval=0.000, maxval=10, step=0.2, title='Band 10', inline='5', group='Bands')
 
-band11 = input.float(1.786, minval=0.001, maxval=10, step=0.2, title='Band 11', inline='10', group='Bands')
-band12 = input.float(2, minval=0.001, maxval=10, step=0.2, title='Band 12', inline='10', group='Bands')
-
-band13 = input.float(2.236, minval=0.001, maxval=10, step=0.2, title='Band 13', inline='11', group='Bands')
-band14 = input.float(2.382, minval=0.001, maxval=10, step=0.2, title='Band 14', inline='11', group='Bands')
-
-band15 = input.float(2.5, minval=0.001, maxval=10, step=0.2, title='Band 15', inline='12', group='Bands')
-band16 = input.float(2.618, minval=0.001, maxval=10, step=0.2, title='Band 16', inline='12', group='Bands')
-
-band17 = input.float(2.786, minval=0.001, maxval=10, step=0.2, title='Band 17', inline='13', group='Bands')
-band18 = input.float(3, minval=0.001, maxval=10, step=0.2, title='Band 18', inline='13', group='Bands')
+band11 = input.float(2.786, minval=0.000, maxval=10, step=0.2, title='Band 11', inline='6', group='Bands')
+band12 = input.float(3, minval=0.000, maxval=10, step=0.2, title='Band 12', inline='6', group='Bands')
 
 var string GROUP_AVERAGE_COLORS = 'Colors and theme'
 var string inputFill = input.string(title='Fill background between bands?', options=['Always', 'When price inside channel', 'Never'], group=GROUP_AVERAGE_COLORS, defval='When price inside channel')
@@ -251,43 +242,31 @@ else    // 'Keltner Channel'
     rangeMA := bandsStyleKC == "True Range" ? ta.tr(true) : bandsStyleKC == "Average True Range" ? ta.atr(atrlength) : ta.rma(high - low, length)
     multiplier * rangeMA
 
-upper_1  = basis + (band1*deviation)
-// upper_2  = basis + (band2*deviation)
-upper_3  = basis + (band3*deviation)
-// upper_4  = basis + (band4*deviation)
-upper_5  = basis + (band5*deviation)
-upper_6  = basis + (band6*deviation)
-upper_7  = basis + (band7*deviation)
-// upper_8  = basis + (band8*deviation)
-upper_9  = basis + (band9*deviation)
-// upper_10 = basis + (band10*deviation)
-upper_11 = basis + (band11*deviation)
-upper_12 = basis + (band12*deviation)
-upper_13 = basis + (band13*deviation)
-// upper_14 = basis + (band14*deviation)
-upper_15 = basis + (band15*deviation)
-// upper_16 = basis + (band16*deviation)
-upper_17 = basis + (band17*deviation)
-upper_18 = basis + (band18*deviation)
+upper_1     = band1 > 0 ? basis + (band1*deviation) : na
+upper_2     = band2 > 0 ? basis + (band2*deviation) : na
+upper_3     = band3 > 0 ? basis + (band3*deviation) : na
+upper_4     = band4 > 0 ? basis + (band4*deviation) : na
+upper_5     = band5 > 0 ? basis + (band5*deviation) : na
+upper_6     = band6 > 0 ? basis + (band6*deviation) : na
+upper_7     = band7 > 0 ? basis + (band7*deviation) : na
+upper_8     = band8 > 0 ? basis + (band8*deviation) : na
+upper_9     = band9 > 0 ? basis + (band9*deviation) : na
+upper_10    = band10 > 0 ? basis + (band10*deviation) : na
+upper_11    = band11 > 0 ? basis + (band11*deviation) : na
+upper_12    = band12 > 0 ? basis + (band12*deviation) : na
 
-lower_1  = basis - (band1*deviation)
-// lower_2  = basis - (band2*deviation)
-lower_3  = basis - (band3*deviation)
-// lower_4  = basis - (band4*deviation)
-lower_5  = basis - (band5*deviation)
-lower_6  = basis - (band6*deviation)
-lower_7  = basis - (band7*deviation)
-// lower_8  = basis - (band8*deviation)
-lower_9  = basis - (band9*deviation)
-// lower_10 = basis - (band10*deviation)
-lower_11 = basis - (band11*deviation)
-lower_12 = basis - (band12*deviation)
-lower_13 = basis - (band13*deviation)
-// lower_14 = basis - (band14*deviation)
-lower_15 = basis - (band15*deviation)
-// lower_16 = basis - (band16*deviation)
-lower_17 = basis - (band17*deviation)
-lower_18 = basis - (band18*deviation)
+lower_1     = band1 > 0 ? basis - (band1*deviation) : na
+lower_2     = band2 > 0 ? basis - (band2*deviation) : na
+lower_3     = band3 > 0 ? basis - (band3*deviation) : na
+lower_4     = band4 > 0 ? basis - (band4*deviation) : na
+lower_5     = band5 > 0 ? basis - (band5*deviation) : na
+lower_6     = band6 > 0 ? basis - (band6*deviation) : na
+lower_7     = band7 > 0 ? basis - (band7*deviation) : na
+lower_8     = band8 > 0 ? basis - (band8*deviation) : na
+lower_9     = band9 > 0 ? basis - (band9*deviation) : na
+lower_10    = band10 > 0 ? basis - (band10*deviation) : na
+lower_11    = band11 > 0 ? basis - (band11*deviation) : na
+lower_12    = band12 > 0 ? basis - (band12*deviation) : na
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Functions {
@@ -299,71 +278,54 @@ f_changeLineColor(series float _line) =>
             inputColorBear
     else
         colorDefault
-        
-// f_FillBackground() =>
-//     switch inputFill == 'When price inside channel' => 
-//         'Always'
-        
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Plots {
 pBasis = plot(basis, title='Moving Average', color=f_changeLineColor(basis), linewidth=3)
 
 pUpper1  = plot(upper_1 , color=color.new(colorBandUp1, 50), linewidth=1, title="Band Upper 1", display=display.all)
-// pUpper2  = plot(upper_2 , color=color.new(colorBandUp1, 45), linewidth=1, title="Band Upper 2", display=display.none)
-pUpper3  = plot(upper_3 , color=color.new(colorBandUp1, 40), linewidth=1, title="Band Upper 3", display=display.all)
-// pUpper4  = plot(upper_4 , color=color.new(colorBandUp1, 35), linewidth=1, title="Band Upper 4", display=display.none)
-pUpper5  = plot(upper_5 , color=color.new(colorBandUp1, 30), linewidth=1, title="Band Upper 5", display=display.all)
-pUpper6  = plot(upper_6 , color=color.new(colorBandUp1, 0) , linewidth=2, title="Band Upper 6", display=display.all)
+pUpper2  = plot(upper_2 , color=color.new(colorBandUp1, 40), linewidth=1, title="Band Upper 2", display=display.all)
+pUpper3  = plot(upper_3 , color=color.new(colorBandUp1, 30), linewidth=1, title="Band Upper 3", display=display.all)
+pUpper4  = plot(upper_4 , color=color.new(colorBandUp1, 0) , linewidth=2, title="Band Upper 4", display=display.all)
 
-pUpper7  = plot(upper_7 , color=color.new(colorBandUp2, 50), linewidth=1, title="Band Upper 7", display=display.all)
-// pUpper8  = plot(upper_8 , color=color.new(colorBandUp2, 45), linewidth=1, title="Band Upper 8", display=display.none)
-pUpper9  = plot(upper_9 , color=color.new(colorBandUp2, 40), linewidth=1, title="Band Upper 9", display=display.all)
-// pUpper10 = plot(upper_10, color=color.new(colorBandUp2, 35), linewidth=1, title="Band Upper 10", display=display.none)
-pUpper11 = plot(upper_11, color=color.new(colorBandUp2, 30), linewidth=1, title="Band Upper 11", display=display.all)
-pUpper12 = plot(upper_12, color=color.new(colorBandUp2, 0) , linewidth=2, title="Band Upper 12", display=display.all)
+pUpper5  = plot(upper_5 , color=color.new(colorBandUp2, 50), linewidth=1, title="Band Upper 5", display=display.all)
+pUpper6  = plot(upper_6 , color=color.new(colorBandUp2, 40), linewidth=1, title="Band Upper 6", display=display.all)
+pUpper7 = plot(upper_7, color=color.new(colorBandUp2, 30), linewidth=1, title="Band Upper 7", display=display.all)
+pUpper8 = plot(upper_8, color=color.new(colorBandUp2, 0) , linewidth=2, title="Band Upper 8", display=display.all)
 
-pUpper13 = plot(upper_13, color=color.new(colorBandUp3, 50), linewidth=1, title="Band Upper 13", display=display.all)
-// pUpper14 = plot(upper_14, color=color.new(colorBandUp3, 45), linewidth=1, title="Band Upper 14", display=display.none)
-pUpper15 = plot(upper_15, color=color.new(colorBandUp3, 40), linewidth=1, title="Band Upper 15", display=display.all)
-// pUpper16 = plot(upper_16, color=color.new(colorBandUp3, 35), linewidth=1, title="Band Upper 16", display=display.none)
-pUpper17 = plot(upper_17, color=color.new(colorBandUp3, 30), linewidth=1, title="Band Upper 17", display=display.all)
-pUpper18 = plot(upper_18, color=color.new(colorBandUp3, 0), linewidth=3, title="Band Upper 18", display=display.all)
+pUpper9 = plot(upper_9, color=color.new(colorBandUp3, 50), linewidth=1, title="Band Upper 9", display=display.all)
+pUpper10 = plot(upper_10, color=color.new(colorBandUp3, 40), linewidth=1, title="Band Upper 10", display=display.all)
+pUpper11 = plot(upper_11, color=color.new(colorBandUp3, 30), linewidth=1, title="Band Upper 11", display=display.all)
+pUpper12 = plot(upper_12, color=color.new(colorBandUp3, 0), linewidth=3, title="Band Upper 12", display=display.all)
 
 pLower1  = plot(lower_1 , color=color.new(colorBandDown1, 50), linewidth=1, title="Band Lower 1", display=display.all)
-// pLower2  = plot(lower_2 , color=color.new(colorBandDown1, 45), linewidth=1, title="Band Lower 2", display=display.none)
-pLower3  = plot(lower_3 , color=color.new(colorBandDown1, 40), linewidth=1, title="Band Lower 3", display=display.all)
-// pLower4  = plot(lower_4 , color=color.new(colorBandDown1, 35), linewidth=1, title="Band Lower 4", display=display.none)
-pLower5  = plot(lower_5 , color=color.new(colorBandDown1, 30), linewidth=1, title="Band Lower 5", display=display.all)
-pLower6  = plot(lower_6 , color=color.new(colorBandDown1, 0) , linewidth=2, title="Band Lower 6", display=display.all)
+pLower2  = plot(lower_2 , color=color.new(colorBandDown1, 40), linewidth=1, title="Band Lower 2", display=display.all)
+pLower3  = plot(lower_3 , color=color.new(colorBandDown1, 30), linewidth=1, title="Band Lower 3", display=display.all)
+pLower4  = plot(lower_4 , color=color.new(colorBandDown1, 0) , linewidth=2, title="Band Lower 4", display=display.all)
 
-pLower7  = plot(lower_7 , color=color.new(colorBandDown2, 50), linewidth=1, title="Band Lower 7", display=display.all)
-// pLower8  = plot(lower_8 , color=color.new(colorBandDown2, 45), linewidth=1, title="Band Lower 8", display=display.none)
-pLower9  = plot(lower_9 , color=color.new(colorBandDown2, 40), linewidth=1, title="Band Lower 9", display=display.all)
-// pLower10 = plot(lower_10, color=color.new(colorBandDown2, 35), linewidth=1, title="Band Lower 10", display=display.none)
-pLower11 = plot(lower_11, color=color.new(colorBandDown2, 30), linewidth=1, title="Band Lower 11", display=display.all)
-pLower12 = plot(lower_12, color=color.new(colorBandDown2, 0) , linewidth=2, title="Band Lower 12", display=display.all)
+pLower5  = plot(lower_5 , color=color.new(colorBandDown2, 50), linewidth=1, title="Band Lower 5", display=display.all)
+pLower6  = plot(lower_6 , color=color.new(colorBandDown2, 40), linewidth=1, title="Band Lower 6", display=display.all)
+pLower7 = plot(lower_7, color=color.new(colorBandDown2, 30), linewidth=1, title="Band Lower 7", display=display.all)
+pLower8 = plot(lower_8, color=color.new(colorBandDown2, 0) , linewidth=2, title="Band Lower 8", display=display.all)
 
-pLower13 = plot(lower_13, color=color.new(colorBandDown3, 50), linewidth=1, title="Band Upper 13", display=display.all)
-// pLower14 = plot(lower_14, color=color.new(colorBandDown3, 45), linewidth=1, title="Band Upper 14", display=display.none)
-pLower15 = plot(lower_15, color=color.new(colorBandDown3, 40), linewidth=1, title="Band Upper 15", display=display.all)
-// pLower16 = plot(lower_16, color=color.new(colorBandDown3, 35), linewidth=1, title="Band Upper 16", display=display.none)
-pLower17 = plot(lower_17, color=color.new(colorBandDown3, 30), linewidth=1, title="Band Upper 17", display=display.all)
-pLower18 = plot(lower_18, color=color.new(colorBandDown3, 0) , linewidth=3, title="Band Upper 18", display=display.all)
+pLower9 = plot(lower_9, color=color.new(colorBandDown3, 50), linewidth=1, title="Band Upper 9", display=display.all)
+pLower10 = plot(lower_10, color=color.new(colorBandDown3, 40), linewidth=1, title="Band Upper 10", display=display.all)
+pLower11 = plot(lower_11, color=color.new(colorBandDown3, 30), linewidth=1, title="Band Upper 11", display=display.all)
+pLower12 = plot(lower_12, color=color.new(colorBandDown3, 0) , linewidth=3, title="Band Upper 12", display=display.all)
 
-fill(pBasis, pUpper6, (inputFill == 'When price inside channel' and src >= basis and src <= upper_6) or (inputFill == 'Always') ? color.new(colorBandUp1, inputColorFillTransparency) : na, 'Fill Level 1 Upper', display=display.all)
-fill(pUpper6, pUpper12, (inputFill == 'When price inside channel' and src >= upper_6 and src <= upper_12) or (inputFill == 'Always') ? color.new(colorBandUp2, inputColorFillTransparency) : na, 'Fill Level 2 Upper', display=display.all)
-fill(pUpper12, pUpper18, (inputFill == 'When price inside channel' and src >= upper_12 and src <= upper_18) or (inputFill == 'Always') ? color.new(colorBandUp3, inputColorFillTransparency) : na, 'Fill Level 3 Upper', display=display.all)
+fill(pBasis, pUpper4, (inputFill == 'When price inside channel' and src >= basis and src <= upper_4) or (inputFill == 'Always') ? color.new(colorBandUp1, inputColorFillTransparency) : na, 'Fill Level 1 Upper', display=display.all)
+fill(pUpper4, pUpper8, (inputFill == 'When price inside channel' and src >= upper_4 and src <= upper_8) or (inputFill == 'Always') ? color.new(colorBandUp2, inputColorFillTransparency) : na, 'Fill Level 2 Upper', display=display.all)
+fill(pUpper8, pUpper12, (inputFill == 'When price inside channel' and src >= upper_8 and src <= upper_12) or (inputFill == 'Always') ? color.new(colorBandUp3, inputColorFillTransparency) : na, 'Fill Level 3 Upper', display=display.all)
 
-fill(pBasis, pLower6, (inputFill == 'When price inside channel' and src <= basis and src >= lower_6) or (inputFill == 'Always') ? color.new(colorBandDown1, inputColorFillTransparency) : na, 'Fill Level 1 Lower', display=display.all)
-fill(pLower6, pLower12, (inputFill == 'When price inside channel'  and src <= lower_6 and src >= lower_12) or (inputFill == 'Always') ? color.new(colorBandDown2, inputColorFillTransparency) : na, 'Fill Level 2 Lower', display=display.all)
-fill(pLower12, pLower18, (inputFill == 'When price inside channel'  and src <= lower_12 and src >= lower_18) or (inputFill == 'Always') ? color.new(colorBandDown3, inputColorFillTransparency) : na, 'Fill Level 3 Lower', display=display.all)
+fill(pBasis, pLower4, (inputFill == 'When price inside channel' and src <= basis and src >= lower_4) or (inputFill == 'Always') ? color.new(colorBandDown1, inputColorFillTransparency) : na, 'Fill Level 1 Lower', display=display.all)
+fill(pLower4, pLower8, (inputFill == 'When price inside channel'  and src <= lower_4 and src >= lower_8) or (inputFill == 'Always') ? color.new(colorBandDown2, inputColorFillTransparency) : na, 'Fill Level 2 Lower', display=display.all)
+fill(pLower8, pLower12, (inputFill == 'When price inside channel'  and src <= lower_8 and src >= lower_12) or (inputFill == 'Always') ? color.new(colorBandDown3, inputColorFillTransparency) : na, 'Fill Level 3 Lower', display=display.all)
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Statistics {
 //--> Total bars
 var bars = 0
-if (not na(upper_6))
+if (not na(upper_4))
     bars += 1
     
 //--> Bands
@@ -379,42 +341,42 @@ if (not na(upper_6))
 
 // Between Basis and Band 1
 var u1 = 0.0
-if (high >= basis and high <= upper_6) or (low >= basis and low <= upper_6) or (close >= basis and close <= upper_6) or (open >= basis and open <= upper_6)
+if (high >= basis and high <= upper_4) or (low >= basis and low <= upper_4) or (close >= basis and close <= upper_4) or (open >= basis and open <= upper_4)
     u1 += 1
 
 // Between Band 1 and Band 2
 var u2 = 0.0
-if (high >= upper_6 and high <= upper_12) or (low >= upper_6 and low <= upper_12) or (close >= upper_6 and close <= upper_12) or (open >= upper_6 and open <= upper_12)
+if (high >= upper_4 and high <= upper_8) or (low >= upper_4 and low <= upper_8) or (close >= upper_4 and close <= upper_8) or (open >= upper_4 and open <= upper_8)
     u2 += 1
     
 // Between Band 2 and Band 3
 var u3 = 0.0
-if (high >= upper_12 and high <= upper_18) or (low >= upper_12 and low <= upper_18) or (high >= upper_12 and high <= upper_18) or (low >= upper_12 and low <= upper_18)
+if (high >= upper_8 and high <= upper_12) or (low >= upper_8 and low <= upper_12) or (high >= upper_8 and high <= upper_12) or (low >= upper_8 and low <= upper_12)
     u3 += 1
 
 // Greater than Band 3
 var u4 = 0.0
-if (high > upper_18)
+if (high > upper_12)
     u4 += 1        
 
 // Between Basis and Band 1
 var l1 = 0.0
-if (low <= basis and low >= lower_6) or (high <= basis and high >= lower_6) or (close <= basis and close >= lower_6) or (open <= basis and open >= lower_6)
+if (low <= basis and low >= lower_4) or (high <= basis and high >= lower_4) or (close <= basis and close >= lower_4) or (open <= basis and open >= lower_4)
     l1 += 1
 
 // Between Band 1 and Band 2
 var l2 = 0.0
-if (low <= lower_6 and low >= lower_12) or (high <= lower_6 and high >= lower_12) or (close <= lower_6 and close >= lower_12) or (open <= lower_6 and open >= lower_12)
+if (low <= lower_4 and low >= lower_8) or (high <= lower_4 and high >= lower_8) or (close <= lower_4 and close >= lower_8) or (open <= lower_4 and open >= lower_8)
     l2 += 1
     
 // Between Band 2 and Band 3
 var l3 = 0.0
-if (low <= lower_12 and low >= lower_18) or (high <= lower_12 and high >= lower_18) or (close <= lower_12 and close >= lower_18) or (open <= lower_12 and open >= lower_18)
+if (low <= lower_8 and low >= lower_12) or (high <= lower_8 and high >= lower_12) or (close <= lower_8 and close >= lower_12) or (open <= lower_8 and open >= lower_12)
     l3 += 1
     
 // Greater Band 3
 var l4 = 0.0
-if low < lower_18
+if low < lower_12
     l4 += 1        
 
 //--> Probability
@@ -434,28 +396,28 @@ p_l4 = l4/bars * 100
 //--> Labels
 var label label_u1 = na
 label.delete(label_u1)
-label_u1 := label.new(bar_index+25, upper_6, text=str.tostring(p_u1,"#.##")+"%" + ' (' + str.tostring(u1) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp1, textalign=text.align_left)
+label_u1 := label.new(bar_index+25, upper_4, text=str.tostring(p_u1,"#.##")+"%" + ' (' + str.tostring(u1) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp1, textalign=text.align_left)
 
 var label label_u2 = na
 label.delete(label_u2)
-label_u2 := label.new(bar_index+25, upper_12, text=str.tostring(p_u2,"#.##")+"%" + ' (' + str.tostring(u2) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp2, textalign=text.align_left)
+label_u2 := label.new(bar_index+25, upper_8, text=str.tostring(p_u2,"#.##")+"%" + ' (' + str.tostring(u2) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp2, textalign=text.align_left)
 
 var label label_u3 = na
 label.delete(label_u3)
-label_u3 := label.new(bar_index+25, upper_18, text=str.tostring(p_u3,"#.##")+"%" + ' (' + str.tostring(u3) + ')' + 
+label_u3 := label.new(bar_index+25, upper_12, text=str.tostring(p_u3,"#.##")+"%" + ' (' + str.tostring(u3) + ')' + 
   '     Out: ' + str.tostring(p_u4,"#.##")+"%" + ' (' + str.tostring(u4) + ')', style=label.style_label_left, color=na, textcolor=colorBandUp3, textalign=text.align_left)
 
 var label label_l1 = na
 label.delete(label_l1)
-label_l1 := label.new(bar_index+25, lower_6, text=str.tostring(p_l1,"#.##")+"%" + ' (' + str.tostring(l1) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown1, textalign=text.align_left)
+label_l1 := label.new(bar_index+25, lower_4, text=str.tostring(p_l1,"#.##")+"%" + ' (' + str.tostring(l1) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown1, textalign=text.align_left)
 
 var label label_l2 = na
 label.delete(label_l2)
-label_l2 := label.new(bar_index+25, lower_12, text=str.tostring(p_l2,"#.##")+"%" + ' (' + str.tostring(l2) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown2, textalign=text.align_left)
+label_l2 := label.new(bar_index+25, lower_8, text=str.tostring(p_l2,"#.##")+"%" + ' (' + str.tostring(l2) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown2, textalign=text.align_left)
 
 var label label_l3 = na
 label.delete(label_l3)
-label_l3 := label.new(bar_index+25, lower_18, text=str.tostring(p_l3,"#.##")+"%" + ' (' + str.tostring(l3) + ')' + 
+label_l3 := label.new(bar_index+25, lower_12, text=str.tostring(p_l3,"#.##")+"%" + ' (' + str.tostring(l3) + ')' + 
   '     Out: ' + str.tostring(p_l4,"#.##")+"%" + ' (' + str.tostring(l4) + ')', style=label.style_label_left, color=na, textcolor=colorBandDown3, textalign=text.align_left)
 
 var label label_total = na
