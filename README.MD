@@ -80,3 +80,11 @@ Bollinger Bands with 55 Least Squares Moving Averagere:
 - TimeFliesBuy ("Triple Bollinger Bands")
 - Rashad ("Fibonacci Bollinger Bands")
 - Dicargo_Beam ("Is the Bollinger Bands assumption wrong?")
+
+# Donations
+
+- BTC: 1PnerhP2C5xeGXxAkhxQX4rYrBUguGe1yh
+- LTC: LMhAfkzJoUHHWfFCcMnnQ4jdV4Vi9WZG3W
+- Stellar: GCPONJ5OX7KSEHBNPB2SKJZJGYSXTRN7ORYQXW443BLEFLS72ZVYISG2
+- Zcash: t1THe8JvsYqt7bmbFWkFpjssJhJLka6VAhk
+- Tron: TSVnEgtoYhRMwiRYfDFC51XfGNSpxse2yz
