@@ -81,7 +81,7 @@ Bollinger Bands with 55 Least Squares Moving Averagere:
 - Rashad ("Fibonacci Bollinger Bands")
 - Dicargo_Beam ("Is the Bollinger Bands assumption wrong?")
 
-# Donations
+## █ Donations
 
 - BTC: 1PnerhP2C5xeGXxAkhxQX4rYrBUguGe1yh
 - LTC: LMhAfkzJoUHHWfFCcMnnQ4jdV4Vi9WZG3W
