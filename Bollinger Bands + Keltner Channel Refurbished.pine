@@ -392,10 +392,10 @@ pLower6  = plot(lower_6 , color=color.new(colorBandDown2, 40), linewidth=1, titl
 pLower7 = plot(lower_7, color=color.new(colorBandDown2, 30), linewidth=1, title="Band Lower 7", display=display.all)
 pLower8 = plot(lower_8, color=color.new(colorBandDown2, 0) , linewidth=2, title="Band Lower 8", display=display.all)
 
-pLower9 = plot(lower_9, color=color.new(colorBandDown3, 50), linewidth=1, title="Band Upper 9", display=display.all)
-pLower10 = plot(lower_10, color=color.new(colorBandDown3, 40), linewidth=1, title="Band Upper 10", display=display.all)
-pLower11 = plot(lower_11, color=color.new(colorBandDown3, 30), linewidth=1, title="Band Upper 11", display=display.all)
-pLower12 = plot(lower_12, color=color.new(colorBandDown3, 0) , linewidth=3, title="Band Upper 12", display=display.all)
+pLower9 = plot(lower_9, color=color.new(colorBandDown3, 50), linewidth=1, title="Band Lower 9", display=display.all)
+pLower10 = plot(lower_10, color=color.new(colorBandDown3, 40), linewidth=1, title="Band Lower 10", display=display.all)
+pLower11 = plot(lower_11, color=color.new(colorBandDown3, 30), linewidth=1, title="Band Lower 11", display=display.all)
+pLower12 = plot(lower_12, color=color.new(colorBandDown3, 0) , linewidth=3, title="Band Lower 12", display=display.all)
 
 fill(pBasis, pUpper4, (inputFill == 'When price inside channel' and src >= basis and src <= upper_4) or (inputFill == 'Always') ? color.new(colorBandUp1, inputColorFillTransparency) : na, 'Fill Level 1 Upper', display=display.all)
 fill(pUpper4, pUpper8, (inputFill == 'When price inside channel' and src >= upper_4 and src <= upper_8) or (inputFill == 'Always') ? color.new(colorBandUp2, inputColorFillTransparency) : na, 'Fill Level 2 Upper', display=display.all)
