@@ -96,14 +96,14 @@ var string ZSMA = 'Zero-Lag Simple Moving Average'
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Inputs {
-src = input.source(defval = hl2, title = 'Source', inline = '1')
+src = input.source(defval = close, title = 'Source', inline = '1')
 
 string typeIndicator = input.string(defval = 'Bollinger Bands', title = 'Indicator', options = ['Bollinger Bands', 'Keltner Channel', 'Parallel Channels', 'VWAP Bands'], inline = '1')
 
 string stDevSrc = input.string(defval = 'Price', title = 'Standard Deviation Source for Bollinger Bands', options = ['Price', 'MA'], inline = '1', tooltip = 'Price or Moving Average')
 
-string typeMa = input.string(defval = REGMA, title = 'MA', options = [AARMA, ALSMA, AHMA, ADEMA, ALMA, AUTOL, COVWEMA, COVWMA, CMA, CORMA, DEMA, DONCHIAN, DONCHIAN_HL, EFRAMA, EDSMA, EVWMA, EPMA, EDMA, EHMA, EMA, ETMA, FIBOWMA, FISHLSMA, FAMA, FRAMA, GMA, HKAMA, HMA, JURIK, KAMA, LC_LSMA, LEOMA, LSMA, LINWMA, MEDIAN, MAMA, MCMA, XEMA, REMA, REGMA, RMA, REPMA, RVWAP, RSIMA, SMA, SW_MA, SRWMA, SMMA, SWMA, TT3, TREMA, TRSMA, TEMA, THMA, VIDYA, VAMA, VWAP, WMA, WWMA, ZEMA, ZSMA], inline = '2')
-int length = input.int(233, minval = 1, inline = '2', title = 'Length', tooltip = 'For moving averages with * the length parameter does not apply')
+string typeMa = input.string(defval = EMA, title = 'MA', options = [AARMA, ALSMA, AHMA, ADEMA, ALMA, AUTOL, COVWEMA, COVWMA, CMA, CORMA, DEMA, DONCHIAN, DONCHIAN_HL, EFRAMA, EDSMA, EVWMA, EPMA, EDMA, EHMA, EMA, ETMA, FIBOWMA, FISHLSMA, FAMA, FRAMA, GMA, HKAMA, HMA, JURIK, KAMA, LC_LSMA, LEOMA, LSMA, LINWMA, MEDIAN, MAMA, MCMA, XEMA, REMA, REGMA, RMA, REPMA, RVWAP, RSIMA, SMA, SW_MA, SRWMA, SMMA, SWMA, TT3, TREMA, TRSMA, TEMA, THMA, VIDYA, VAMA, VWAP, WMA, WWMA, ZEMA, ZSMA], inline = '2')
+int length = input.int(21, minval = 1, inline = '2', title = 'Length', tooltip = 'For moving averages with * the length parameter does not apply')
 float multiplier = input.float(1, minval = 0.001, title = 'Multiplier', inline = '2')
 
 int parallelChannelsDivisor = input.int(24, minval = 1, inline = '2a', title = 'Parallel Channels Divisor', tooltip = 'Only for Parallel Channels')
@@ -356,81 +356,99 @@ fill(pLower8, pLower12, inputFill == 'When price inside channel' and src <= lowe
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Statistics {
-//--> Total bars
-bars = ta.cum(not na(upper_4) ? 1 : 0)
+// Optimized: Using var for incremental accumulation instead of ta.cum() on every bar
 
-//--> Bands
-// upper_6  = 1
-// upper_12 = 2
-// upper_18 = 3
-// basis
-// lower_6  = 1
-// lower_12 = 2
-// lower_18 = 3
+//--> Total bars (incremental counter)
+var int bars = 0
+if not na(upper_4)
+    bars += 1
 
-//--> Counts the bar between the bands
+//--> Incremental counters for band zones
+var int u1 = 0
+var int u2 = 0
+var int u3 = 0
+var int u4 = 0
+var int l1 = 0
+var int l2 = 0
+var int l3 = 0
+var int l4 = 0
 
-// Between Basis and Band 1
-u1 = ta.cum(high >= basis and high <= upper_4 or low >= basis and low <= upper_4 or close >= basis and close <= upper_4 or open >= basis and open <= upper_4 ? 1 : 0)
+// Between Basis and Band 1 (Upper)
+if high >= basis and high <= upper_4 or low >= basis and low <= upper_4 or close >= basis and close <= upper_4 or open >= basis and open <= upper_4
+    u1 += 1
 
-// Between Band 1 and Band 2
-u2 = ta.cum(high >= upper_4 and high <= upper_8 or low >= upper_4 and low <= upper_8 or close >= upper_4 and close <= upper_8 or open >= upper_4 and open <= upper_8 ? 1 : 0)
+// Between Band 1 and Band 2 (Upper)
+if high >= upper_4 and high <= upper_8 or low >= upper_4 and low <= upper_8 or close >= upper_4 and close <= upper_8 or open >= upper_4 and open <= upper_8
+    u2 += 1
 
-// Between Band 2 and Band 3
-u3 = ta.cum(high >= upper_8 and high <= upper_12 or low >= upper_8 and low <= upper_12 or high >= upper_8 and high <= upper_12 or low >= upper_8 and low <= upper_12 ? 1 : 0)
+// Between Band 2 and Band 3 (Upper)
+if high >= upper_8 and high <= upper_12 or low >= upper_8 and low <= upper_12
+    u3 += 1
 
-// Greater than Band 3
-u4 = ta.cum(high > upper_12 ? 1 : 0)
+// Greater than Band 3 (Upper)
+if high > upper_12
+    u4 += 1
 
-// Between Basis and Band 1
-l1 = ta.cum(low <= basis and low >= lower_4 or high <= basis and high >= lower_4 or close <= basis and close >= lower_4 or open <= basis and open >= lower_4 ? 1 : 0)
+// Between Basis and Band 1 (Lower)
+if low <= basis and low >= lower_4 or high <= basis and high >= lower_4 or close <= basis and close >= lower_4 or open <= basis and open >= lower_4
+    l1 += 1
 
-// Between Band 1 and Band 2
-l2 = ta.cum(low <= lower_4 and low >= lower_8 or high <= lower_4 and high >= lower_8 or close <= lower_4 and close >= lower_8 or open <= lower_4 and open >= lower_8 ? 1 : 0)
+// Between Band 1 and Band 2 (Lower)
+if low <= lower_4 and low >= lower_8 or high <= lower_4 and high >= lower_8 or close <= lower_4 and close >= lower_8 or open <= lower_4 and open >= lower_8
+    l2 += 1
 
-// Between Band 2 and Band 3
-l3 = ta.cum(low <= lower_8 and low >= lower_12 or high <= lower_8 and high >= lower_12 or close <= lower_8 and close >= lower_12 or open <= lower_8 and open >= lower_12 ? 1 : 0)
+// Between Band 2 and Band 3 (Lower)
+if low <= lower_8 and low >= lower_12 or high <= lower_8 and high >= lower_12 or close <= lower_8 and close >= lower_12 or open <= lower_8 and open >= lower_12
+    l3 += 1
 
-// Greater Band 3
-l4 = ta.cum(low < lower_12 ? 1 : 0)
+// Greater than Band 3 (Lower)
+if low < lower_12
+    l4 += 1
 
-//--> Probability
-var float p_u1 = na
-var float p_l1 = na
+//--> Labels (created once with var, updated with set_* methods)
+var label lblU1 = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = colorBandUp1, textalign = text.align_left)
+var label lblU2 = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = colorBandUp2, textalign = text.align_left)
+var label lblU3 = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = colorBandUp3, textalign = text.align_left)
+var label lblL1 = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = colorBandDown1, textalign = text.align_left)
+var label lblL2 = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = colorBandDown2, textalign = text.align_left)
+var label lblL3 = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = colorBandDown3, textalign = text.align_left)
+var label lblBasis = label.new(na, na, '', style = label.style_label_left, color = na, textcolor = color.white, textalign = text.align_left)
 
-var float p_u2 = na
-var float p_l2 = na
+if barstate.islast
+    // Calculate probabilities
+    float p_u1 = bars > 0 ? u1 / bars * 100 : 0
+    float p_u2 = bars > 0 ? u2 / bars * 100 : 0
+    float p_u3 = bars > 0 ? u3 / bars * 100 : 0
+    float p_u4 = bars > 0 ? u4 / bars * 100 : 0
+    float p_l1 = bars > 0 ? l1 / bars * 100 : 0
+    float p_l2 = bars > 0 ? l2 / bars * 100 : 0
+    float p_l3 = bars > 0 ? l3 / bars * 100 : 0
+    float p_l4 = bars > 0 ? l4 / bars * 100 : 0
 
-var float p_u3 = na
-var float p_l3 = na
+    // Update label positions and text
+    int lblX = bar_index + xloc_labels
 
-var float p_u4 = na
-var float p_l4 = na
+    label.set_xy(lblU1, lblX, upper_4)
+    label.set_text(lblU1, str.tostring(p_u1, '#.##') + '%' + ' (' + str.tostring(u1) + ')')
 
-if barstate.islast and na(p_u1)
-    p_u1 := u1 / bars * 100
-    p_l1 := l1 / bars * 100
+    label.set_xy(lblU2, lblX, upper_8)
+    label.set_text(lblU2, str.tostring(p_u2, '#.##') + '%' + ' (' + str.tostring(u2) + ')')
 
-    p_u2 := u2 / bars * 100
-    p_l2 := l2 / bars * 100
+    label.set_xy(lblU3, lblX, upper_12)
+    label.set_text(lblU3, str.tostring(p_u3, '#.##') + '%' + ' (' + str.tostring(u3) + ')' + '     Out: ' + str.tostring(p_u4, '#.##') + '%' + ' (' + str.tostring(u4) + ')')
 
-    p_u3 := u3 / bars * 100
-    p_l3 := l3 / bars * 100
+    label.set_xy(lblL1, lblX, lower_4)
+    label.set_text(lblL1, str.tostring(p_l1, '#.##') + '%' + ' (' + str.tostring(l1) + ')')
 
-    p_u4 := u4 / bars * 100
-    p_l4 := l4 / bars * 100
+    label.set_xy(lblL2, lblX, lower_8)
+    label.set_text(lblL2, str.tostring(p_l2, '#.##') + '%' + ' (' + str.tostring(l2) + ')')
 
-    //--> Labels
-    label.new(bar_index + xloc_labels, upper_4, text = str.tostring(p_u1, '#.##') + '%' + ' (' + str.tostring(u1) + ')', style = label.style_label_left, color = na, textcolor = colorBandUp1, textalign = text.align_left)
-    label.new(bar_index + xloc_labels, upper_8, text = str.tostring(p_u2, '#.##') + '%' + ' (' + str.tostring(u2) + ')', style = label.style_label_left, color = na, textcolor = colorBandUp2, textalign = text.align_left)
-    label.new(bar_index + xloc_labels, upper_12, text = str.tostring(p_u3, '#.##') + '%' + ' (' + str.tostring(u3) + ')' + '     Out: ' + str.tostring(p_u4, '#.##') + '%' + ' (' + str.tostring(u4) + ')', style = label.style_label_left, color = na, textcolor = colorBandUp3, textalign = text.align_left)
+    label.set_xy(lblL3, lblX, lower_12)
+    label.set_text(lblL3, str.tostring(p_l3, '#.##') + '%' + ' (' + str.tostring(l3) + ')' + '     Out: ' + str.tostring(p_l4, '#.##') + '%' + ' (' + str.tostring(l4) + ')')
 
-    label.new(bar_index + xloc_labels, lower_4, text = str.tostring(p_l1, '#.##') + '%' + ' (' + str.tostring(l1) + ')', style = label.style_label_left, color = na, textcolor = colorBandDown1, textalign = text.align_left)
-    label.new(bar_index + xloc_labels, lower_8, text = str.tostring(p_l2, '#.##') + '%' + ' (' + str.tostring(l2) + ')', style = label.style_label_left, color = na, textcolor = colorBandDown2, textalign = text.align_left)
-    label.new(bar_index + xloc_labels, lower_12, text = str.tostring(p_l3, '#.##') + '%' + ' (' + str.tostring(l3) + ')' + '     Out: ' + str.tostring(p_l4, '#.##') + '%' + ' (' + str.tostring(l4) + ')', style = label.style_label_left, color = na, textcolor = colorBandDown3, textalign = text.align_left)
-
-    label.new(bar_index + xloc_labels, basis, text = 'Total bars : ' + str.tostring(bars, '#'), style = label.style_label_left, color = na, textcolor = color.white, textalign = text.align_left)
-    // ———————————————————————————————————————— }
+    label.set_xy(lblBasis, lblX, basis)
+    label.set_text(lblBasis, 'Total bars : ' + str.tostring(bars, '#'))
+// ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Lines {
 var line lineBase = na
