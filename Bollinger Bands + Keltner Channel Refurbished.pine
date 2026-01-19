@@ -103,7 +103,7 @@ string typeIndicator = input.string(defval = 'Bollinger Bands', title = 'Indicat
 string stDevSrc = input.string(defval = 'Price', title = 'Standard Deviation Source for Bollinger Bands', options = ['Price', 'MA'], inline = '1', tooltip = 'Price or Moving Average')
 
 string typeMa = input.string(defval = EMA, title = 'MA', options = [AARMA, ALSMA, AHMA, ADEMA, ALMA, AUTOL, COVWEMA, COVWMA, CMA, CORMA, DEMA, DONCHIAN, DONCHIAN_HL, EFRAMA, EDSMA, EVWMA, EPMA, EDMA, EHMA, EMA, ETMA, FIBOWMA, FISHLSMA, FAMA, FRAMA, GMA, HKAMA, HMA, JURIK, KAMA, LC_LSMA, LEOMA, LSMA, LINWMA, MEDIAN, MAMA, MCMA, XEMA, REMA, REGMA, RMA, REPMA, RVWAP, RSIMA, SMA, SW_MA, SRWMA, SMMA, SWMA, TT3, TREMA, TRSMA, TEMA, THMA, VIDYA, VAMA, VWAP, WMA, WWMA, ZEMA, ZSMA], inline = '2')
-int length = input.int(21, minval = 1, inline = '2', title = 'Length', tooltip = 'For moving averages with * the length parameter does not apply')
+int length = input.int(50, minval = 1, inline = '2', title = 'Length', tooltip = 'For moving averages with * the length parameter does not apply')
 float multiplier = input.float(1, minval = 0.001, title = 'Multiplier', inline = '2')
 
 int parallelChannelsDivisor = input.int(24, minval = 1, inline = '2a', title = 'Parallel Channels Divisor', tooltip = 'Only for Parallel Channels')
@@ -207,7 +207,7 @@ color inputColorBull = input.color(color.new(#3af13c, 0), 'Bull', group = GROUP_
 color inputColorBear = input.color(color.new(#ff0000, 0), 'Bear', group = GROUP_AVERAGE_COLORS, inline = 'Base')
 color colorDefault = input.color(color.new(color.white, 0), 'Default', group = GROUP_AVERAGE_COLORS, inline = 'Base')
 
-int xloc_labels = input.int(defval = 50, title = 'Position of Labels (x)', group = GROUP_AVERAGE_COLORS, inline = 'Labels', tooltip = 'Last bar + x')
+int xloc_labels = input.int(defval = 25, title = 'Position of Labels (x)', group = GROUP_AVERAGE_COLORS, inline = 'Labels', tooltip = 'Last bar + x')
 string linesExtended = input.string(title = 'Show lines of Previous Session?', options = ['Never', 'Limited', 'Extended right'], group = GROUP_AVERAGE_COLORS, defval = 'Never', inline = 'Lines')
 // ———————————————————————————————————————— }
 
