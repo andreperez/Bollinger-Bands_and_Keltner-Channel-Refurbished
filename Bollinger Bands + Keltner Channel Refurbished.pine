@@ -208,7 +208,7 @@ color inputColorBear = input.color(color.new(#ff0000, 0), 'Bear', group = GROUP_
 color colorDefault = input.color(color.new(color.white, 0), 'Default', group = GROUP_AVERAGE_COLORS, inline = 'Base')
 
 int xloc_labels = input.int(defval = 25, title = 'Position of Labels (x)', group = GROUP_AVERAGE_COLORS, inline = 'Labels', tooltip = 'Last bar + x')
-string linesExtended = input.string(title = 'Show lines of Previous Session?', options = ['Never', 'Limited', 'Extended right'], group = GROUP_AVERAGE_COLORS, defval = 'Never', inline = 'Lines')
+string linesExtended = input.string(title = 'Extend lines of Bands?', options = ['Never', 'Limited', 'Extended right'], group = GROUP_AVERAGE_COLORS, defval = 'Never', inline = 'Lines')
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Error Handling {
