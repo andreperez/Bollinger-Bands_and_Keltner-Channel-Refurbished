@@ -209,7 +209,6 @@ color colorDefault = input.color(color.new(color.white, 0), 'Default', group = G
 
 int xloc_labels = input.int(defval = 50, title = 'Position of Labels (x)', group = GROUP_AVERAGE_COLORS, inline = 'Labels', tooltip = 'Last bar + x')
 string linesExtended = input.string(title = 'Show lines of Previous Session?', options = ['Never', 'Limited', 'Extended right'], group = GROUP_AVERAGE_COLORS, defval = 'Never', inline = 'Lines')
-string linesPeriod = input.string(title = 'Historical Period', options = ['Hour', 'Day', 'Session', 'Week', 'Month', 'Quarter', 'Year'], group = GROUP_AVERAGE_COLORS, defval = 'Session', inline = 'Lines', tooltip = 'Display bands from X periods ago on the SAME timeframe (NOT Multi-Timeframe).\nExample: On a 1-hour chart with "Day" selected, shows bands from 1 day ago.\nThis shows historical values, not data from a different timeframe.')
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Error Handling {
@@ -442,28 +441,6 @@ var line lineLower4 = na
 var line lineLower8 = na
 var line lineLower12 = na
 
-// Calculate the last bar index from the selected historical period
-// IMPORTANT: This displays bands from X periods AGO on the SAME chart timeframe (NOT Multi-Timeframe).
-// For example: On a 1-hour chart with 'Day' selected, it shows bands from 1 day ago.
-// This uses historical data within the current timeframe, not data from a different timeframe.
-int lastBarOfPreviousPeriod = switch linesPeriod
-    'Hour' => ta.valuewhen(timeframe.change('60'), bar_index, 0) - 1
-    'Day' => ta.valuewhen(timeframe.change('D'), bar_index, 0) - 1
-    'Session' => ta.valuewhen(timeframe.change('D'), bar_index, 0) - 1
-    'Week' => ta.valuewhen(timeframe.change('W'), bar_index, 0) - 1
-    'Month' => ta.valuewhen(timeframe.change('M'), bar_index, 0) - 1
-    'Quarter' => ta.valuewhen(timeframe.change('3M'), bar_index, 0) - 1
-    'Year' => ta.valuewhen(timeframe.change('12M'), bar_index, 0) - 1
-    => na
-
-var line lineUpper12_p = na
-var line lineUpper8_p = na
-var line lineUpper4_p = na
-var line lineBasis_p = na
-var line lineLower12_p = na
-var line lineLower8_p = na
-var line lineLower4_p = na
-
 if linesExtended != 'Never' and barstate.islast and na(lineUpper12)
     lineUpper12 := line.new(x1 = bar_index, y1 = upper_12, x2 = bar_index + 80, y2 = upper_12, color = linesExtended == 'Never' ? na : color.new(colorBandUp3, 0), width = 2, xloc = xloc.bar_index, style = line.style_solid, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
     lineUpper8 := line.new(x1 = bar_index, y1 = upper_8, x2 = bar_index + 80, y2 = upper_8, color = linesExtended == 'Never' ? na : color.new(colorBandUp2, 0), width = 2, xloc = xloc.bar_index, style = line.style_solid, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
@@ -472,20 +449,6 @@ if linesExtended != 'Never' and barstate.islast and na(lineUpper12)
     lineLower4 := line.new(x1 = bar_index, y1 = lower_4, x2 = bar_index + 80, y2 = lower_4, color = linesExtended == 'Never' ? na : color.new(colorBandDown1, 0), width = 2, xloc = xloc.bar_index, style = line.style_solid, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
     lineLower8 := line.new(x1 = bar_index, y1 = lower_8, x2 = bar_index + 80, y2 = lower_8, color = linesExtended == 'Never' ? na : color.new(colorBandDown2, 0), width = 2, xloc = xloc.bar_index, style = line.style_solid, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
     lineLower12 := line.new(x1 = bar_index, y1 = lower_12, x2 = bar_index + 80, y2 = lower_12, color = linesExtended == 'Never' ? na : color.new(colorBandDown3, 0), width = 2, xloc = xloc.bar_index, style = line.style_solid, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-
-    // Draw lines from previous period (if valid bar index exists)
-    if not na(lastBarOfPreviousPeriod) and lastBarOfPreviousPeriod >= 0
-        int barsBack = bar_index - lastBarOfPreviousPeriod
-        lineUpper12_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = upper_12[barsBack], x2 = bar_index + 80, y2 = upper_12[barsBack], color = linesExtended == 'Never' ? na : color.new(colorBandUp3, 0), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-        lineUpper8_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = upper_8[barsBack], x2 = bar_index + 80, y2 = upper_8[barsBack], color = linesExtended == 'Never' ? na : color.new(colorBandUp2, 0), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-        lineUpper4_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = upper_4[barsBack], x2 = bar_index + 80, y2 = upper_4[barsBack], color = linesExtended == 'Never' ? na : color.new(colorBandUp1, 0), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-
-        lineBasis_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = basis[barsBack], x2 = bar_index + 80, y2 = basis[barsBack], color = linesExtended == 'Never' ? na : f_changeLineColor(basis), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-
-        lineLower12_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = lower_12[barsBack], x2 = bar_index + 80, y2 = lower_12[barsBack], color = linesExtended == 'Never' ? na : color.new(colorBandDown3, 0), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-        lineLower8_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = lower_8[barsBack], x2 = bar_index + 80, y2 = lower_8[barsBack], color = linesExtended == 'Never' ? na : color.new(colorBandDown2, 0), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-        lineLower4_p := line.new(x1 = lastBarOfPreviousPeriod, y1 = lower_4[barsBack], x2 = bar_index + 80, y2 = lower_4[barsBack], color = linesExtended == 'Never' ? na : color.new(colorBandDown1, 0), width = 2, xloc = xloc.bar_index, style = line.style_dotted, extend = linesExtended == 'Extended right' ? extend.right : extend.none)
-    lineLower4_p
 // ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Alerts {
