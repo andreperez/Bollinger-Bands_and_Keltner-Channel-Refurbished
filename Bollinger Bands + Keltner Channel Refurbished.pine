@@ -1,4 +1,4 @@
-s//@version=6
+//@version=6
 // @author=andre_007
 // Credits:
 //      - TradingView (BB, KC, ATR, MA's)
@@ -213,9 +213,10 @@ string linesExtended = input.string(title = 'Show lines of Previous Session?', o
 
 // ———————————————————————————————————————— Error Handling {
 // For VWAP: stop the indicator on charts with no volume
-if (typeMa == VWAP or typeMa == RVWAP) and barstate.islast and ta.cum(nz(volume)) == 0
+bool chartHasVolume = (ta.cum(nz(volume)) != 0)
+if (typeMa == VWAP or typeMa == RVWAP) and barstate.islast and not chartHasVolume
     runtime.error('No volume is provided by the data vendor.')
-    // ———————————————————————————————————————— }
+// ———————————————————————————————————————— }
 
 // ———————————————————————————————————————— Calcs {
 float new_earnings = request.earnings(syminfo.tickerid, earnings.actual, barmerge.gaps_on, barmerge.lookahead_on, ignore_invalid_symbol = true)
