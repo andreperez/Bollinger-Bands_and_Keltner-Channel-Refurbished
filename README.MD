@@ -6,7 +6,12 @@ This is an indicator that brings together Bollinger Bands and Keltner's Channels
 
 Both are very similar, so I decided to make a merge of the best features I found out there.
 
-Here there is the possibility of choosing one of these two as needed.
+Here there is the possibility of choosing one of these modes as needed:
+
+- Bollinger Bands
+- Keltner Channel
+- Parallel Channels
+- VWAP Bands
 
 In addition, I added the following resources:
 
@@ -14,7 +19,7 @@ In addition, I added the following resources:
 
 2. Detachment of the bands in which the price was present;
 
-3. Choice of Moving Average: "Simple", "Exponential", "Regularized Exponential", "Hull", "Arnaud Legoux", "Weighted Moving Average", "Least Squares Moving Average (Linear Regression)", "Volume Weighted Moving Average", "Smoothed Moving Averagee", "Median", "VWAP");
+3. Choice of Moving Average: "Simple", "Exponential", "Regularized Exponential", "Hull", "Arnaud Legoux", "Weighted Moving Average", "Least Squares Moving Average (Linear Regression)", "Volume Weighted Moving Average", "Smoothed Moving Average", "Median", "VWAP");
 
 4. Statistics: bars count within the bands
 
@@ -58,20 +63,17 @@ This can be a multiple of the daily high/low range, or more commonly a multiple 
 
 ## Examples
 
-Bollinger Bands with 200 REMA:
-![alt](Images/01.png)
+Bollinger Bands:
+![Bollinger Bands example](Images/BTCUSDT.P_2026-01-21_17-04-08%20-%20Bollinger.png)
 
-Keltner Channel with 200 REMA:
-![alt](Images/02.png)
+Keltner Channel:
+![Keltner Channel example](Images/BTCUSDT.P_2026-01-21_17-05-01%20-%20Keltner.png)
 
-Bollinger Bands with 55 ALMA:
-![alt](Images/03.png)
+Parallel Channels:
+![Parallel Channels example](Images/BTCUSDT.P_2026-01-21_17-07-42%20-%20Parallel.png)
 
-Keltner Channel with 55 ALMA:
-![alt](Images/04.png)
-
-Bollinger Bands with 55 Least Squares Moving Averagere:
-![alt](Images/05.png)
+VWAP Bands:
+![VWAP Bands example](Images/BTCUSDT.P_2026-01-21_17-11-21%20-%20VWAP.png)
 
 ## █ Thanks
 
@@ -85,4 +87,4 @@ Bollinger Bands with 55 Least Squares Moving Averagere:
 
 - Bitcoin: bc1qhnj22tdpcaerqt0utrff6mkrm2zhdejs788rra
 - Litecoin: ltc1qclxau32vlpyvulx25w0u7vyh0ew6gcgj7ch6s2
-- Wise: https://wise.com/pay/me/andreeduardop4
+- Wise: [Donate via Wise](https://wise.com/pay/me/andreeduardop4)
