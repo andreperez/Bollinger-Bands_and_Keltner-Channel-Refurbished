@@ -83,8 +83,6 @@ Bollinger Bands with 55 Least Squares Moving Averagere:
 
 ## █ Donations
 
-- BTC: 1PnerhP2C5xeGXxAkhxQX4rYrBUguGe1yh
-- LTC: LMhAfkzJoUHHWfFCcMnnQ4jdV4Vi9WZG3W
-- Stellar: GCPONJ5OX7KSEHBNPB2SKJZJGYSXTRN7ORYQXW443BLEFLS72ZVYISG2
-- Zcash: t1THe8JvsYqt7bmbFWkFpjssJhJLka6VAhk
-- Tron: TSVnEgtoYhRMwiRYfDFC51XfGNSpxse2yz
+- Bitcoin: bc1qhnj22tdpcaerqt0utrff6mkrm2zhdejs788rra
+- Litecoin: ltc1qclxau32vlpyvulx25w0u7vyh0ew6gcgj7ch6s2
+- Wise: https://wise.com/pay/me/andreeduardop4
